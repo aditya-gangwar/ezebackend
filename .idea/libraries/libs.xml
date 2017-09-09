@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="libs">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/libs/backendless.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/servlet-api-2.5.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/myc_security.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="bin">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/bin/CodeRunner.jar!/" />
+      <root url="jar://$PROJECT_DIR$/bin/weborb.jar!/" />
+      <root url="jar://$PROJECT_DIR$/bin/aws-java-sdk-1.2.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <withJansi>true</withJansi>
+        <encoder>
+            <!--<pattern>%date %highlight([%level]) %logger %thread %message%n%xException</pattern>-->
+            <pattern>%highlight([%level]) %message%n%xException</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>../log/application.log</file>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>../log/application.%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
+
+            <!-- keep 30 days' worth of history -->
+            <maxHistory>30</maxHistory>
+
+            <!-- or whenever the file size reaches 10MB -->
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>10MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%date [%level] %message%n%xException</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="TIMERS-ROLLING-FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>../log/timers-coderunner.log</file>
+        <rollingPolicy class="com.backendless.util.RollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>backup_logs/${LOGGER_PREFIX}_timers_coderunner.[id].%d{yyyy-MM-dd}.log</fileNamePattern>
+
+            <!-- keep 30 days' worth of history -->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>[%level]%date::%logger::%thread::%message%n%xException%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="REGINST-ROLLING-FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>../../../../play/target/play-logs/registerinstance.log</file>
+        <rollingPolicy class="com.backendless.util.RollingPolicy">
+            <fileNamePattern>../../../../play/target/backup_logs/registerinstance.[id].%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>10</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>[%level]%date::%logger::%thread::%message%n%xException%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="com.backendless.registrator.operation.RegisterInstanceOperation" level="OFF" additivity="false">
+        <appender-ref ref="REGINST-ROLLING-FILE"/>
+    </logger>
+
+    <appender name="WORKERS-ROLLING-FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>../log/workers-coderunner.log</file>
+        <rollingPolicy class="com.backendless.util.RollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>backup_logs/${LOGGER_PREFIX}_workers_coderunner.[id].%d{yyyy-MM-dd}.log</fileNamePattern>
+
+            <!-- keep 30 days' worth of history -->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>[%level]%date::%logger::%thread::%message%n%xException%n</pattern>
+        </encoder>
+    </appender>
+
+    <!--<root level="TRACE">-->
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
+    </root>
+
+    <logger name="TimersLogger" level="DEBUG" additivity="false">
+        <appender-ref ref="TIMERS-ROLLING-FILE" />
+    </logger>
+
+    <logger name="WorkersLogger" level="OFF" additivity="false">
+        <appender-ref ref="WORKERS-ROLLING-FILE" />
+    </logger>
+</configuration>

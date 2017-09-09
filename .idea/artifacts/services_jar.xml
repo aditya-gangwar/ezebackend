@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="services:jar">
+    <output-path>$PROJECT_DIR$/classesServices/jar</output-path>
+    <root id="archive" name="ezebackend.jar">
+      <element id="module-output" name="ezebackend" />
+      <element id="module-output" name="common" />
+    </root>
+  </artifact>
+</component>
