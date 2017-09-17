@@ -510,12 +510,12 @@ public class MerchantServices implements IBackendlessService {
                         // if all amounts 0 - then ignore
                         // i.e. probably this customer bought the card from this merchant
                         // but didn't do any txn as such
-                        if(cb.getCb_credit()==0 &&
+                        /*if(cb.getCb_credit()==0 &&
                                 cb.getCb_debit()==0 &&
                                 cb.getCl_credit()==0 &&
                                 cb.getCl_debit()==0) {
                             continue;
-                        }
+                        }*/
 
                         // update customer counts
                         // no need to check for 'debit' amount - as 'credit' amount is total amount and includes debit amount too
@@ -531,11 +531,11 @@ public class MerchantServices implements IBackendlessService {
 
                         // update amounts
                         stats.cb_credit = stats.cb_credit + cb.getCb_credit();
-                        stats.cb_debit = stats.cb_debit + cb.getCb_debit();
+                        //stats.cb_debit = stats.cb_debit + cb.getCb_debit();
                         stats.cash_credit = stats.cash_credit + cb.getCl_credit();
                         stats.cash_debit = stats.cash_debit + cb.getCl_debit();
                         stats.bill_amt_total = stats.bill_amt_total + cb.getTotal_billed();
-                        stats.bill_amt_no_cb = stats.bill_amt_no_cb + (cb.getTotal_billed() - cb.getCb_billed());
+                        //stats.bill_amt_no_cb = stats.bill_amt_no_cb + (cb.getTotal_billed() - cb.getCb_billed());
 
                         // write record as csv string
                         if(cb.getCustomer()!=null) {
@@ -920,11 +920,13 @@ public class MerchantServices implements IBackendlessService {
         cashback.setCust_private_id(customer.getPrivate_id());
 
         cashback.setCb_credit(0);
-        cashback.setCb_debit(0);
+        cashback.setExtra_cb_credit(0);
+        //cashback.setCb_debit(0);
         cashback.setCl_credit(0);
         cashback.setCl_debit(0);
+        cashback.setCl_overdraft(0);
         cashback.setTotal_billed(0);
-        cashback.setCb_billed(0);
+        //cashback.setCb_billed(0);
 
         //cashback.setMerchant(merchant);
         cashback.setCustomer(customer);

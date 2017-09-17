@@ -35,12 +35,13 @@ public class TxnProcessHelper {
     private String mMerchantId;
     private String mCustomerId;
 
-    private int cl_debit;
     private int cl_credit;
-    private int cb_debit;
     private int cb_credit;
+    private int cl_debit;
+    private int cl_overdraft;
+    //private int cb_debit;
     private int cl_balance;
-    private int cb_balance;
+    //private int cb_balance;
     private String merchantName;
     private String txnDate;
 
@@ -106,29 +107,38 @@ public class TxnProcessHelper {
                     mEdr[BackendConstants.EDR_SPECIAL_FLAG_IDX] = BackendConstants.BACKEND_EDR_SECURITY_BREACH;
                     throw new BackendlessException(String.valueOf(ErrorCodes.ACCOUNT_NOT_ENUF_BALANCE), "");
                 }
-                if(mTransaction.getCb_debit() > (cashback.getCb_credit()-cashback.getCb_debit()) ) {
+                /*if(mTransaction.getCb_debit() > (cashback.getCb_credit()-cashback.getCb_debit()) ) {
                     // already checked in app - so shouldn't reach here at first place
                     mEdr[BackendConstants.EDR_SPECIAL_FLAG_IDX] = BackendConstants.BACKEND_EDR_SECURITY_BREACH;
                     throw new BackendlessException(String.valueOf(ErrorCodes.CB_NOT_ENUF_BALANCE), "");
-                }
+                }*/
 
                 // update amounts in cashback object
+                // 3 types of credit
                 cashback.setCl_credit(cashback.getCl_credit() + mTransaction.getCl_credit());
+                // 2 types of debit
                 cashback.setCl_debit(cashback.getCl_debit() + mTransaction.getCl_debit());
+                cashback.setCl_overdraft(cashback.getCl_overdraft() + mTransaction.getCl_overdraft());
 
                 // check for cash account limit - after above amount update only
                 // only if some add to account is happening
-                if ( mTransaction.getCl_credit()>0 &&
-                        (cashback.getCl_credit() - cashback.getCl_debit()) > MyGlobalSettings.getCashAccLimit()) {
+                int accBalance = CommonUtils.getAccBalance(cashback);
+                if ( accBalance > MyGlobalSettings.getCashAccLimit()
+                        || Math.abs(accBalance) > MyGlobalSettings.getAccOverdraftLimit() ) {
                     // already checked in app - so shouldn't reach here at first place
                     mEdr[BackendConstants.EDR_SPECIAL_FLAG_IDX] = BackendConstants.BACKEND_EDR_SECURITY_BREACH;
                     throw new BackendlessException(String.valueOf(ErrorCodes.CASH_ACCOUNT_LIMIT_RCHD), "Cash account limit reached: " + mCustomerId);
                 }
-                cashback.setCb_credit( cashback.getCb_credit() +
+
+                // Cashback credit intentionally done, after checking for above limits
+                cashback.setCb_credit(cashback.getCb_credit() + mTransaction.getCb_credit());
+                cashback.setCb_credit(cashback.getExtra_cb_credit() + mTransaction.getExtra_cb_credit());
+                cashback.setTotal_billed(cashback.getTotal_billed() + mTransaction.getTotal_billed());
+
+                /*cashback.setCb_credit( cashback.getCb_credit() +
                         (mTransaction.getCb_credit()+mTransaction.getExtra_cb_credit()) );
                 cashback.setCb_debit(cashback.getCb_debit() + mTransaction.getCb_debit());
-                cashback.setTotal_billed(cashback.getTotal_billed() + mTransaction.getTotal_billed());
-                cashback.setCb_billed(cashback.getCb_billed() + mTransaction.getCb_billed());
+                cashback.setCb_billed(cashback.getCb_billed() + mTransaction.getCb_billed());*/
 
                 // add/update transaction fields
                 //mTransaction.setCust_mobile(mCustomer.getMobile_num());
@@ -169,8 +179,19 @@ public class TxnProcessHelper {
                     mTransaction = BackendOps.updateTxn(mTransaction, mMerchant.getTxn_table(), mMerchant.getCashback_table());
                 }
 
+                // any exception after above (like in sending sms) - should not result in failure msg to the caller
+                // as the txn got committed
+
                 if(sendSMS) {
-                    buildAndSendTxnSMS();
+                    try {
+                        buildAndSendTxnSMS();
+                        // no exception - means function execution success
+                        mEdr[BackendConstants.EDR_RESULT_IDX] = BackendConstants.BACKEND_EDR_RESULT_OK;
+
+                    } catch (Exception ex) {
+                        BackendUtils.handleException(ex, false,mLogger,mEdr);
+                        // ignore and dont throw it
+                    }
                 }
 
             } else {
@@ -178,9 +199,6 @@ public class TxnProcessHelper {
                 mEdr[BackendConstants.EDR_SPECIAL_FLAG_IDX] = BackendConstants.BACKEND_EDR_SECURITY_BREACH;
                 throw new BackendlessException(String.valueOf(ErrorCodes.CUST_NOT_REG_WITH_MCNT), "Customer not registered with this Merchant: "+ whereClause+","+ mMerchant.getCashback_table()+","+mMerchantId +","+ mCustomerId);
             }
-
-            // no exception - means function execution success
-            mEdr[BackendConstants.EDR_RESULT_IDX] = BackendConstants.BACKEND_EDR_RESULT_OK;
 
             return mTransaction;
 
@@ -362,7 +380,7 @@ public class TxnProcessHelper {
                 ( mTransaction.getCl_debit()>0 || mTransaction.getCb_debit()>0 ||
                         mTransaction.getCancelTime()!=null )) {*/
         if(mCustomer.getAdmin_status()==DbConstants.USER_STATUS_LIMITED_CREDIT_ONLY &&
-                ( mTransaction.getCl_debit()>0 || mTransaction.getCb_debit()>0 )) {
+                ( mTransaction.getCl_debit()>0 || mTransaction.getCl_overdraft()>0 )) {
             mValidException = true; // to avoid logging of this exception
             throw new BackendlessException(String.valueOf(ErrorCodes.LIMITED_ACCESS_CREDIT_TXN_ONLY), "");
         }
@@ -487,20 +505,23 @@ public class TxnProcessHelper {
         //String txnId = mTransaction.getTrans_id();
         //mLogger.debug("Transaction update was successful: "+custMobile+", "+txnId);
 
-        cl_debit = mTransaction.getCl_debit();
         cl_credit = mTransaction.getCl_credit();
-        cb_debit = mTransaction.getCb_debit();
         cb_credit = mTransaction.getCb_credit() + mTransaction.getExtra_cb_credit();
+        cl_debit = mTransaction.getCl_debit();
+        cl_overdraft = mTransaction.getCl_overdraft();
+        //cb_debit = mTransaction.getCb_debit();
 
         // Send SMS only in cases of 'redeem > INR 10' and 'add cash in account'
         if( cl_debit > BackendConstants.SEND_TXN_SMS_CL_MIN_AMOUNT
-            || cl_credit > BackendConstants.SEND_TXN_SMS_CL_MIN_AMOUNT
-            || cb_debit > BackendConstants.SEND_TXN_SMS_CB_MIN_AMOUNT
+                || cl_overdraft > 0
+                || cl_credit > BackendConstants.SEND_TXN_SMS_CL_MIN_AMOUNT
+//                || cb_debit > BackendConstants.SEND_TXN_SMS_CB_MIN_AMOUNT
                 ) {
             Cashback cashback = mTransaction.getCashback();
             merchantName = mTransaction.getMerchant_name().toUpperCase(Locale.ENGLISH);
-            cb_balance = cashback.getCb_credit() - cashback.getCb_debit();
-            cl_balance = cashback.getCl_credit() - cashback.getCl_debit();
+//            cb_balance = cashback.getCb_credit() - cashback.getCb_debit();
+//            cl_balance = cashback.getCl_credit() - cashback.getCl_debit();
+            cl_balance = CommonUtils.getAccBalance(cashback);
 
             SimpleDateFormat sdf = new SimpleDateFormat(CommonConstants.DATE_FORMAT_ONLY_DATE_BACKEND, CommonConstants.DATE_LOCALE);
             sdf.setTimeZone(TimeZone.getTimeZone(CommonConstants.TIMEZONE));
@@ -518,7 +539,21 @@ public class TxnProcessHelper {
     private String buildSMS() {
         String sms=null;
 
-        if(cl_debit>BackendConstants.SEND_TXN_SMS_CL_MIN_AMOUNT && cb_debit>BackendConstants.SEND_TXN_SMS_CB_MIN_AMOUNT) {
+        if(cl_debit> BackendConstants.SEND_TXN_SMS_CL_MIN_AMOUNT && cl_overdraft <= 0) {
+            sms = String.format(SmsConstants.SMS_TXN_DEBIT_CL,merchantName,cl_debit,txnDate,cl_balance);
+
+        } else if(cl_debit <= 0 && cl_overdraft > 0) {
+            sms = String.format(SmsConstants.SMS_TXN_DEBIT_OD,merchantName,cl_overdraft,txnDate,cl_balance);
+
+        } else if(cl_debit > 0 && cl_overdraft > 0) {
+            sms = String.format(SmsConstants.SMS_TXN_DEBIT_CL_OD,merchantName,cl_debit,cl_overdraft,txnDate,cl_balance);
+
+        } else if(cl_credit>BackendConstants.SEND_TXN_SMS_CL_MIN_AMOUNT) {
+            sms = String.format(SmsConstants.SMS_TXN_CREDIT_CL,merchantName,cl_credit,txnDate,cl_balance);
+
+        }
+
+        /*if(cl_debit>BackendConstants.SEND_TXN_SMS_CL_MIN_AMOUNT && cb_debit>BackendConstants.SEND_TXN_SMS_CB_MIN_AMOUNT) {
             sms = String.format(SmsConstants.SMS_TXN_DEBIT_CL_CB,merchantName,cl_debit,cb_debit,txnDate,cl_balance,cb_balance);
 
         } else if(cl_credit> BackendConstants.SEND_TXN_SMS_CL_MIN_AMOUNT && cb_debit>BackendConstants.SEND_TXN_SMS_CB_MIN_AMOUNT) {
@@ -532,7 +567,7 @@ public class TxnProcessHelper {
 
         } else if(cb_debit> BackendConstants.SEND_TXN_SMS_CB_MIN_AMOUNT) {
             sms = String.format(SmsConstants.SMS_TXN_DEBIT_CB,merchantName,cb_debit,txnDate,cl_balance,cb_balance);
-        }
+        }*/
         return sms;
     }
 
