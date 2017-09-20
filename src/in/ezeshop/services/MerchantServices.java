@@ -214,7 +214,7 @@ public class MerchantServices implements IBackendlessService {
         }
     }
 
-    public Merchants updateSettings(String cbRate, boolean addClEnabled, String email, String contactPhone,
+    public Merchants updateSettings(String cbRate, boolean addClEnabled, boolean overdraftEnabled, String email, String contactPhone,
                                     boolean askLinkedInvNum, boolean linkedInvNumOptional, boolean invNumOnlyNmbrs,
                                     String ppCbRate, int ppMinAmt) {
 
@@ -224,6 +224,7 @@ public class MerchantServices implements IBackendlessService {
         mEdr[BackendConstants.EDR_API_NAME_IDX] = "updateSettings";
         mEdr[BackendConstants.EDR_API_PARAMS_IDX] = cbRate+BackendConstants.BACKEND_EDR_SUB_DELIMETER+
                 addClEnabled+BackendConstants.BACKEND_EDR_SUB_DELIMETER+
+                overdraftEnabled+BackendConstants.BACKEND_EDR_SUB_DELIMETER+
                 email;
 
         try {
@@ -245,6 +246,7 @@ public class MerchantServices implements IBackendlessService {
             // update settings
             merchant.setCb_rate(cbRate);
             merchant.setCl_add_enable(addClEnabled);
+            merchant.setCl_overdraft_enable(overdraftEnabled);
             merchant.setEmail(email);
             merchant.setContactPhone(contactPhone);
             merchant.setInvoiceNumAsk(askLinkedInvNum);
