@@ -31,7 +31,7 @@ public class MerchantServicesNoLogin implements IBackendlessService {
     /*
      * Public methods: Backend REST APIs
      */
-    public void setDeviceForLogin(String loginId, String deviceInfo, String rcvdOtp) {
+    /*public void setDeviceForLogin(String loginId, String deviceInfo, String rcvdOtp) {
 
         BackendUtils.initAll();
         long startTime = System.currentTimeMillis();
@@ -79,7 +79,7 @@ public class MerchantServicesNoLogin implements IBackendlessService {
         } finally {
             BackendUtils.finalHandling(startTime,mLogger,mEdr);
         }
-    }
+    }*/
 
     public void resetMerchantPwd(String userId, String deviceId, String dob) {
 
@@ -121,7 +121,7 @@ public class MerchantServicesNoLogin implements IBackendlessService {
             BackendUtils.checkMerchantStatus(merchant, mEdr, mLogger);
 
             // Check if from trusted device
-            List<MerchantDevice> trustedDevices = merchant.getTrusted_devices();
+            /*List<MerchantDevice> trustedDevices = merchant.getTrusted_devices();
             // don't check if trusted device list empty
             // Can happen in 2 cases:
             // 1) first login after merchant is registered
@@ -131,7 +131,7 @@ public class MerchantServicesNoLogin implements IBackendlessService {
                     mEdr[BackendConstants.EDR_SPECIAL_FLAG_IDX] = BackendConstants.BACKEND_EDR_SECURITY_BREACH;
                     throw new BackendlessException(String.valueOf(ErrorCodes.NOT_TRUSTED_DEVICE), "");
                 }
-            }
+            }*/
 
             // check for 'extra verification'
             String storedDob = merchant.getDob();
@@ -256,6 +256,9 @@ public class MerchantServicesNoLogin implements IBackendlessService {
         String passwd = BackendUtils.generateTempPassword();
         // update user account for the password
         user.setPassword(passwd);
+        merchant.setAutoPasswd(true);
+        user.setProperty("merchant",merchant);
+
         BackendOps.updateUser(user);
 
         // Send SMS through HTTP

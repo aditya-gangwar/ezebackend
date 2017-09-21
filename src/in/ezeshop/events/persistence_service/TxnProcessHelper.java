@@ -132,7 +132,7 @@ public class TxnProcessHelper {
 
                 // Cashback credit intentionally done, after checking for above limits
                 cashback.setCb_credit(cashback.getCb_credit() + mTransaction.getCb_credit());
-                cashback.setCb_credit(cashback.getExtra_cb_credit() + mTransaction.getExtra_cb_credit());
+                cashback.setExtra_cb_credit(cashback.getExtra_cb_credit() + mTransaction.getExtra_cb_credit());
                 cashback.setTotal_billed(cashback.getTotal_billed() + mTransaction.getTotal_billed());
 
                 /*cashback.setCb_credit( cashback.getCb_credit() +

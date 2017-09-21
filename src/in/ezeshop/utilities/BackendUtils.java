@@ -775,7 +775,7 @@ public class BackendUtils {
             merchant.setAgentId(agentId);
             merchant.setCl_credit_limit_for_pin(-1);
             merchant.setCl_debit_limit_for_pin(-1);
-            merchant.setCb_debit_limit_for_pin(-1);
+            //merchant.setCb_debit_limit_for_pin(-1);
             // set cashback and transaction table names
             merchant.setCashback_table(DbConstantsBackend.CASHBACK_TABLE_NAME + city.getCbTableCode());
             BackendOps.describeTable(merchant.getCashback_table()); // just to check that the table exists

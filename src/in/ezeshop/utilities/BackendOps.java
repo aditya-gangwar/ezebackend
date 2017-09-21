@@ -72,7 +72,7 @@ public class BackendOps {
                     break;
                 case DbConstants.USER_TYPE_MERCHANT:
                     queryOptions.addRelated("merchant");
-                    queryOptions.addRelated("merchant.trusted_devices");
+                    //queryOptions.addRelated("merchant.trusted_devices");
                     if (allChilds) {
                         queryOptions.addRelated("merchant.address");
                     }
@@ -110,7 +110,7 @@ public class BackendOps {
         relationProps.add("internalUser");
 
         if(allMchntChilds) {
-            relationProps.add("merchant.trusted_devices");
+            //relationProps.add("merchant.trusted_devices");
             relationProps.add("merchant.address");
         }
 
@@ -140,9 +140,9 @@ public class BackendOps {
             if(addressChild) {
                 queryOptions.addRelated("address");
             }
-            if(trustedDevicesChild) {
+            /*if(trustedDevicesChild) {
                 queryOptions.addRelated("trusted_devices");
-            }
+            }*/
             query.setQueryOptions(queryOptions);
         }
 

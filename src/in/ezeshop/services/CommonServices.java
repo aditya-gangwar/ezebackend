@@ -83,6 +83,8 @@ public class CommonServices implements IBackendlessService {
 
             // Find mobile number
             String mobileNum = null;
+            Merchants merchant = null;
+            Customers customer = null;
             switch(userType) {
                 case DbConstants.USER_TYPE_MERCHANT:
                     mLogger.debug("Usertype is Merchant");
@@ -90,14 +92,14 @@ public class CommonServices implements IBackendlessService {
 
                     if(verifyFailed) {
                         validException = true;
-                        Merchants merchant = BackendOps.getMerchant(userId, false, false);
+                        merchant = BackendOps.getMerchant(userId, false, false);
                         int cnt = BackendUtils.handleWrongAttempt(userId, merchant, userType,
                                 DbConstantsBackend.WRONG_PARAM_TYPE_PASSWD, DbConstants.OP_CHANGE_PASSWD, mEdr, mLogger);
                         throw new BackendlessException(String.valueOf(ErrorCodes.VERIFICATION_FAILED_PASSWD), String.valueOf(cnt));
 
                     } else {
                         BackendOps.loadMerchant(user);
-                        Merchants merchant = (Merchants)user.getProperty("merchant");
+                        merchant = (Merchants)user.getProperty("merchant");
                         mLogger.setProperties(merchant.getAuto_id(), DbConstants.USER_TYPE_MERCHANT, merchant.getDebugLogs());
                         mobileNum = merchant.getMobile_num();
                     }
@@ -108,7 +110,7 @@ public class CommonServices implements IBackendlessService {
 
                     if(verifyFailed) {
                         validException = true;
-                        Customers customer = BackendOps.getCustomer(userId, CommonConstants.ID_TYPE_MOBILE, false);
+                        customer = BackendOps.getCustomer(userId, CommonConstants.ID_TYPE_MOBILE, false);
                         int cnt = BackendUtils.handleWrongAttempt(userId, customer, userType,
                                 DbConstantsBackend.WRONG_PARAM_TYPE_PASSWD, DbConstants.OP_CHANGE_PASSWD, mEdr, mLogger);
                         mEdr[BackendConstants.EDR_CUST_ID_IDX] = customer.getPrivate_id();
@@ -116,7 +118,7 @@ public class CommonServices implements IBackendlessService {
 
                     } else {
                         BackendOps.loadCustomer(user);
-                        Customers customer = (Customers)user.getProperty("customer");
+                        customer = (Customers)user.getProperty("customer");
                         mLogger.setProperties(customer.getPrivate_id(), DbConstants.USER_TYPE_CUSTOMER, customer.getDebugLogs());
                         mEdr[BackendConstants.EDR_CUST_ID_IDX] = customer.getPrivate_id();
                         mobileNum = customer.getMobile_num();
@@ -145,6 +147,13 @@ public class CommonServices implements IBackendlessService {
 
             // Change password
             user.setPassword(newPasswd);
+            // set auto password flag
+            switch(userType) {
+                case DbConstants.USER_TYPE_MERCHANT:
+                    merchant.setAutoPasswd(false);
+                    user.setProperty("merchant",merchant);
+                    break;
+            }
             user = BackendOps.updateUser(user);
 
             // Send SMS through HTTP
@@ -200,12 +209,12 @@ public class CommonServices implements IBackendlessService {
             }
 
             // remove sensitive info
-            merchant.setTempDevId("");
+            /*merchant.setTempDevId("");
             List<MerchantDevice> devices = merchant.getTrusted_devices();
             for (MerchantDevice device : devices) {
                 //device.setDevice_id("");
                 device.setNamak("");
-            }
+            }*/
 
             // no exception - means function execution success
             mEdr[BackendConstants.EDR_RESULT_IDX] = BackendConstants.BACKEND_EDR_RESULT_OK;

@@ -269,7 +269,7 @@ public class MerchantServices implements IBackendlessService {
         }
     }
 
-    public void deleteTrustedDevice(String deviceId, String curDeviceId) {
+    /*public void deleteTrustedDevice(String deviceId, String curDeviceId) {
         BackendUtils.initAll();
         long startTime = System.currentTimeMillis();
         mEdr[BackendConstants.EDR_START_TIME_IDX] = String.valueOf(startTime);
@@ -318,7 +318,7 @@ public class MerchantServices implements IBackendlessService {
         } finally {
             BackendUtils.finalHandling(startTime,mLogger,mEdr);
         }
-    }
+    }*/
 
     public Cashback getCashback(String merchantId, String merchantCbTable, String customerId, boolean debugLogs) {
 

@@ -104,8 +104,11 @@ public class MerchantPasswdResetTimer extends com.backendless.servercode.extensi
 
             // update user account for the password
             user.setPassword(passwd);
-            BackendOps.updateUser(user);
-            mLogger.debug("Updated merchant for password reset: " + merchant.getAuto_id());
+            merchant.setAutoPasswd(true);
+            user.setProperty("merchant",merchant);
+            user = BackendOps.updateUser(user);
+            merchant = (Merchants) user.getProperty("merchant");
+            mLogger.debug("Updated merchant for password reset: " + merchant.getAuto_id() +", "+merchant.getAutoPasswd());
 
             // Send SMS through HTTP
             String smsText = SmsHelper.buildPwdResetSMS(op.getMerchant_id(), passwd);
