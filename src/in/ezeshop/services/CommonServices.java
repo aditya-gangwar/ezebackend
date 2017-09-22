@@ -822,7 +822,7 @@ public class CommonServices implements IBackendlessService {
         // Send SMS through HTTP
         String smsText = String.format(SmsConstants.SMS_PIN_INIT,
                 (merchantName==null?"You":merchantName),
-                CommonUtils.getPartialVisibleStr(customer.getMobile_num()),
+                CommonUtils.getHalfVisibleMobileNum(customer.getMobile_num()),
                 MyGlobalSettings.getCustPasswdResetMins().toString());
         SmsHelper.sendSMS(smsText, customer.getMobile_num(), mEdr, mLogger, true);
     }

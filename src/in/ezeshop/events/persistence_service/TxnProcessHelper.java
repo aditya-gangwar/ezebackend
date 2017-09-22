@@ -142,7 +142,7 @@ public class TxnProcessHelper {
 
                 // add/update transaction fields
                 //mTransaction.setCust_mobile(mCustomer.getMobile_num());
-                mTransaction.setCust_mobile(CommonUtils.getPartialVisibleStr(mCustomer.getMobile_num()));
+                mTransaction.setCust_mobile(CommonUtils.getHalfVisibleMobileNum(mCustomer.getMobile_num()));
                 // update cardId with cardNum
                 // mCustomer.getMembership_card() wont be null - as this would have been already verified in commonTxnProcessing()
                 /*if(mTransaction.getUsedCardId()==null || mTransaction.getUsedCardId().isEmpty()) {

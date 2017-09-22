@@ -169,7 +169,7 @@ public class MerchantServicesNoLogin implements IBackendlessService {
                 //Integer mins = MyGlobalSettings.getMchntPasswdResetMins() + GlobalSettingConstants.MERCHANT_PASSWORD_RESET_TIMER_INTERVAL;
                 Integer mins = MyGlobalSettings.getMchntPasswdResetMins();
                 String smsText = String.format(SmsConstants.SMS_PASSWD_RESET_SCHEDULED,
-                        CommonUtils.getPartialVisibleStr(op.getMerchant_id()), mins);
+                        CommonUtils.getHalfVisibleStr(op.getMerchant_id()), mins);
                 // ignore error
                 SmsHelper.sendSMS(smsText, op.getMobile_num(), mEdr, mLogger, true);
 

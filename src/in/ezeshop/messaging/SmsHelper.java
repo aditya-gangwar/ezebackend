@@ -93,12 +93,12 @@ public class SmsHelper {
      * Methods to build SMS texts
      */
 
-    public static String buildNewCardSMS(String userId, String card_num) {
+    /*public static String buildNewCardSMS(String userId, String card_num) {
         return String.format(SmsConstants.SMS_CUSTOMER_NEW_CARD, card_num, CommonUtils.getPartialVisibleStr(userId));
-    }
+    }*/
 
     public static String buildMobileChangeSMS(String userId, String mobile_num) {
-        return String.format(SmsConstants.SMS_MOBILE_CHANGE, CommonUtils.getPartialVisibleStr(userId), CommonUtils.getPartialVisibleStr(mobile_num));
+        return String.format(SmsConstants.SMS_MOBILE_CHANGE, CommonUtils.getHalfVisibleMobileNum(userId), CommonUtils.getHalfVisibleMobileNum(mobile_num));
     }
 
     public static String buildFirstPwdResetSMS(String userId, String password) {
@@ -110,19 +110,19 @@ public class SmsHelper {
     }
 
     public static String buildPwdChangeSMS(String userId) {
-        return String.format(SmsConstants.SMS_PASSWD_CHANGED, CommonUtils.getPartialVisibleStr(userId));
+        return String.format(SmsConstants.SMS_PASSWD_CHANGED, CommonUtils.getHalfVisibleStr(userId));
     }
 
     public static String buildPwdResetSMS(String userId, String password) {
-        return String.format(SmsConstants.SMS_PASSWD,CommonUtils.getPartialVisibleStr(userId),password);
+        return String.format(SmsConstants.SMS_PASSWD,CommonUtils.getHalfVisibleStr(userId),password);
     }
 
     public static String buildCustPinResetSMS(String userId, String pin) {
-        return String.format(SmsConstants.SMS_PIN, CommonUtils.getPartialVisibleStr(userId),pin);
+        return String.format(SmsConstants.SMS_PIN, CommonUtils.getHalfVisibleStr(userId),pin);
     }
 
     public static String buildPinChangeSMS(String userId) {
-        return String.format(SmsConstants.SMS_PIN_CHANGED, CommonUtils.getPartialVisibleStr(userId));
+        return String.format(SmsConstants.SMS_PIN_CHANGED, CommonUtils.getHalfVisibleStr(userId));
     }
 
     public static String buildOtpSMS(String userId, String otp, String opCode, String mchntName) {
@@ -132,7 +132,7 @@ public class SmsHelper {
 
             case DbConstants.OP_LOGIN:
                 // OTP to add trusted device
-                return String.format(SmsConstants.SMS_LOGIN_OTP, otp, CommonUtils.getPartialVisibleStr(userId));
+                return String.format(SmsConstants.SMS_LOGIN_OTP, otp, CommonUtils.getHalfVisibleStr(userId));
 
             case DbConstants.OP_CHANGE_MOBILE:
                 return String.format(SmsConstants.SMS_CHANGE_MOB_OTP, otp);
@@ -141,7 +141,7 @@ public class SmsHelper {
                 return String.format(SmsConstants.SMS_NEW_CARD_OTP, otp, CommonUtils.getPartialVisibleStr(userId));*/
 
             case DbConstants.OP_RESET_PIN:
-                return String.format(SmsConstants.SMS_PIN_RESET_OTP, otp, CommonUtils.getPartialVisibleStr(userId));
+                return String.format(SmsConstants.SMS_PIN_RESET_OTP, otp, CommonUtils.getHalfVisibleStr(userId));
 
             case DbConstants.OP_TXN_COMMIT:
                 return String.format(SmsConstants.TXN_COMMIT_OTP, otp, mchntName);

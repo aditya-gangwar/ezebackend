@@ -419,7 +419,7 @@ public class BackendUtils {
             SmsHelper.sendSMS(smsText, merchant.getMobile_num(), edr, logger, true);
 
         } else if(status==DbConstants.USER_STATUS_DISABLED) {
-            smsText = String.format(SmsConstants.SMS_ACCOUNT_DISABLE, CommonUtils.getPartialVisibleStr(merchant.getAuto_id()));
+            smsText = String.format(SmsConstants.SMS_ACCOUNT_DISABLE, CommonUtils.getHalfVisibleStr(merchant.getAuto_id()));
             SmsHelper.sendSMS(smsText, merchant.getMobile_num(), edr, logger, true);
         }
 
@@ -442,7 +442,7 @@ public class BackendUtils {
             smsText = getAccLockedSmsText(customer.getMobile_num(), DbConstants.USER_TYPE_MERCHANT, reason);
             SmsHelper.sendSMS(smsText, customer.getMobile_num(), edr, logger, true);
         } else if(status==DbConstants.USER_STATUS_DISABLED) {
-            smsText = String.format(SmsConstants.SMS_ACCOUNT_DISABLE, CommonUtils.getPartialVisibleStr(customer.getMobile_num()));
+            smsText = String.format(SmsConstants.SMS_ACCOUNT_DISABLE, CommonUtils.getHalfVisibleMobileNum(customer.getMobile_num()));
             SmsHelper.sendSMS(smsText, customer.getMobile_num(), edr, logger, true);
         }
     }
@@ -463,7 +463,7 @@ public class BackendUtils {
             smsText = getAccLockedSmsText(agent.getId(), DbConstants.USER_TYPE_MERCHANT, reason);
             SmsHelper.sendSMS(smsText, agent.getMobile_num(), edr, logger, true);
         } else if(status==DbConstants.USER_STATUS_DISABLED) {
-            smsText = String.format(SmsConstants.SMS_ACCOUNT_DISABLE, CommonUtils.getPartialVisibleStr(agent.getId()));
+            smsText = String.format(SmsConstants.SMS_ACCOUNT_DISABLE, CommonUtils.getHalfVisibleStr(agent.getId()));
             SmsHelper.sendSMS(smsText, agent.getMobile_num(), edr, logger, true);
         }
     }
@@ -474,16 +474,16 @@ public class BackendUtils {
                 userType==DbConstants.USER_TYPE_CC
                 //|| userType==DbConstants.USER_TYPE_CCNT
                 ) {
-            return String.format(SmsConstants.SMS_ACCOUNT_LOCKED_INTERNAL, CommonUtils.getPartialVisibleStr(userId));
+            return String.format(SmsConstants.SMS_ACCOUNT_LOCKED_INTERNAL, CommonUtils.getHalfVisibleStr(userId));
         }
 
         switch(statusReason) {
             case DbConstantsBackend.LOCKED_WRONG_PASSWORD_LIMIT_RCHD:
-                return String.format(SmsConstants.SMS_ACCOUNT_LOCKED_PASSWORD, CommonUtils.getPartialVisibleStr(userId), MyGlobalSettings.getAccBlockMins(userType));
+                return String.format(SmsConstants.SMS_ACCOUNT_LOCKED_PASSWORD, CommonUtils.getHalfVisibleStr(userId), MyGlobalSettings.getAccBlockMins(userType));
             case DbConstantsBackend.LOCKED_WRONG_PIN_LIMIT_RCHD:
-                return String.format(SmsConstants.SMS_ACCOUNT_LOCKED_PIN, CommonUtils.getPartialVisibleStr(userId), MyGlobalSettings.getAccBlockMins(userType));
+                return String.format(SmsConstants.SMS_ACCOUNT_LOCKED_PIN, CommonUtils.getHalfVisibleStr(userId), MyGlobalSettings.getAccBlockMins(userType));
             case DbConstantsBackend.LOCKED_WRONG_VERIFICATION_LIMIT_RCHD:
-                return String.format(SmsConstants.SMS_ACCOUNT_LOCKED_VERIFY_FAILED, CommonUtils.getPartialVisibleStr(userId), MyGlobalSettings.getAccBlockMins(userType));
+                return String.format(SmsConstants.SMS_ACCOUNT_LOCKED_VERIFY_FAILED, CommonUtils.getHalfVisibleStr(userId), MyGlobalSettings.getAccBlockMins(userType));
         }
 
         return null;

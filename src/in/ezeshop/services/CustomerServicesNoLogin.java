@@ -161,7 +161,7 @@ public class CustomerServicesNoLogin implements IBackendlessService {
 
             // Send SMS
             String text = String.format(SmsConstants.SMS_ACCOUNT_ENABLE,
-                    CommonUtils.getPartialVisibleStr(customer.getMobile_num()));
+                    CommonUtils.getHalfVisibleMobileNum(customer.getMobile_num()));
             // ignore SMS sent status
             SmsHelper.sendSMS(text, customer.getMobile_num(), mEdr, mLogger, true);
 
@@ -257,7 +257,7 @@ public class CustomerServicesNoLogin implements IBackendlessService {
                 //Integer mins = MyGlobalSettings.getCustPasswdResetMins() + GlobalSettingConstants.CUSTOMER_PASSWORD_RESET_TIMER_INTERVAL;
                 Integer mins = MyGlobalSettings.getCustPasswdResetMins();
                 String smsText = String.format(SmsConstants.SMS_PASSWD_RESET_SCHEDULED,
-                        CommonUtils.getPartialVisibleStr(op.getMobile_num()), mins);
+                        CommonUtils.getHalfVisibleMobileNum(op.getMobile_num()), mins);
                 // ignore error
                 SmsHelper.sendSMS(smsText, op.getMobile_num(), mEdr, mLogger, true);
 

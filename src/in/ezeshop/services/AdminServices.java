@@ -233,15 +233,15 @@ public class AdminServices implements IBackendlessService {
                 break;
 
             case DbConstants.OP_ENABLE_ACC:
-                smsText = String.format(SmsConstants.SMS_ADMIN_MCHNT_ACC_ENABLE,CommonUtils.getPartialVisibleStr(merchant.getAuto_id()));
+                smsText = String.format(SmsConstants.SMS_ADMIN_MCHNT_ACC_ENABLE,CommonUtils.getHalfVisibleStr(merchant.getAuto_id()));
                 status = SmsHelper.sendSMS(smsText, merchant.getMobile_num(), mEdr, mLogger, true);
                 break;
 
             case DbConstants.OP_CHANGE_MOBILE:
                 // Send SMS on old and new mobile
                 smsText = String.format(SmsConstants.SMS_ADMIN_MCHNT_MOBILE_CHANGE,
-                        CommonUtils.getPartialVisibleStr(merchant.getAuto_id()),
-                        CommonUtils.getPartialVisibleStr(merchant.getMobile_num()));
+                        CommonUtils.getHalfVisibleStr(merchant.getAuto_id()),
+                        CommonUtils.getHalfVisibleMobileNum(merchant.getMobile_num()));
                 status = SmsHelper.sendSMS(smsText, extraParam + "," + merchant.getMobile_num(), mEdr, mLogger, true);
                 break;
 
@@ -257,7 +257,7 @@ public class AdminServices implements IBackendlessService {
                 sdf.setTimeZone(TimeZone.getTimeZone(CommonConstants.TIMEZONE));
 
                 smsText = String.format(SmsConstants.SMS_ADMIN_MCHNT_ACC_CLOSURE,
-                        CommonUtils.getPartialVisibleStr(merchant.getAuto_id()),
+                        CommonUtils.getHalfVisibleStr(merchant.getAuto_id()),
                         String.valueOf(MyGlobalSettings.getMchntExpiryDays()),
                         sdf.format(now.getTime()));
 
@@ -444,14 +444,14 @@ public class AdminServices implements IBackendlessService {
                 break;
 
             case DbConstants.OP_ENABLE_ACC:
-                smsText = String.format(SmsConstants.SMS_ADMIN_CUST_ACC_ENABLE,CommonUtils.getPartialVisibleStr(customer.getMobile_num()));
+                smsText = String.format(SmsConstants.SMS_ADMIN_CUST_ACC_ENABLE,CommonUtils.getHalfVisibleMobileNum(customer.getMobile_num()));
                 status = SmsHelper.sendSMS(smsText, customer.getMobile_num(), mEdr, mLogger, true);
                 break;
 
             case DbConstants.OP_CHANGE_MOBILE:
                 // Send SMS on old and new mobile
                 smsText = String.format(SmsConstants.SMS_ADMIN_CUST_MOBILE_CHANGE,
-                        CommonUtils.getPartialVisibleStr(customer.getMobile_num()));
+                        CommonUtils.getHalfVisibleMobileNum(customer.getMobile_num()));
                 status = SmsHelper.sendSMS(smsText, extraParam + "," + customer.getMobile_num(), mEdr, mLogger, true);
                 break;
 

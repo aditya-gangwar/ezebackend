@@ -135,7 +135,7 @@ public class InternalUserServices implements IBackendlessService {
             }
 
             // send SMS
-            String smsText = String.format(SmsConstants.SMS_ACCOUNT_DISABLE, CommonUtils.getPartialVisibleStr(merchantId));
+            String smsText = String.format(SmsConstants.SMS_ACCOUNT_DISABLE, CommonUtils.getHalfVisibleStr(merchantId));
             SmsHelper.sendSMS(smsText, merchant.getMobile_num(), mEdr, mLogger, true);
 
             // no exception - means function execution success
@@ -223,9 +223,9 @@ public class InternalUserServices implements IBackendlessService {
             // send SMS
             String smsText = null;
             if(ltdModeCase) {
-                smsText = String.format(SmsConstants.SMS_ACCOUNT_LIMITED_MODE, CommonUtils.getPartialVisibleStr(customer.getMobile_num()));
+                smsText = String.format(SmsConstants.SMS_ACCOUNT_LIMITED_MODE, CommonUtils.getHalfVisibleMobileNum(customer.getMobile_num()));
             } else {
-                smsText = String.format(SmsConstants.SMS_ACCOUNT_DISABLE, CommonUtils.getPartialVisibleStr(customer.getMobile_num()));
+                smsText = String.format(SmsConstants.SMS_ACCOUNT_DISABLE, CommonUtils.getHalfVisibleMobileNum(customer.getMobile_num()));
             }
             SmsHelper.sendSMS(smsText, customer.getMobile_num(), mEdr, mLogger, true);
 
