@@ -135,16 +135,21 @@ public class BackendOps {
             query.setWhereClause("mobile_num = '"+userId+"'");
         }
 
-        if(addressChild || trustedDevicesChild) {
+        if(addressChild) {
+            QueryOptions queryOptions = new QueryOptions();
+            queryOptions.addRelated("address");
+            query.setQueryOptions(queryOptions);
+        }
+        /*if(addressChild || trustedDevicesChild) {
             QueryOptions queryOptions = new QueryOptions();
             if(addressChild) {
                 queryOptions.addRelated("address");
             }
-            /*if(trustedDevicesChild) {
+            if(trustedDevicesChild) {
                 queryOptions.addRelated("trusted_devices");
-            }*/
+            }
             query.setQueryOptions(queryOptions);
-        }
+        }*/
 
         BackendlessCollection<Merchants> user = Backendless.Data.of( Merchants.class ).find(query);
         if( user.getTotalObjects() == 0) {

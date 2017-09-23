@@ -141,8 +141,8 @@ public class TxnProcessHelper {
                 cashback.setCb_billed(cashback.getCb_billed() + mTransaction.getCb_billed());*/
 
                 // add/update transaction fields
-                //mTransaction.setCust_mobile(mCustomer.getMobile_num());
-                mTransaction.setCust_mobile(CommonUtils.getHalfVisibleMobileNum(mCustomer.getMobile_num()));
+                mTransaction.setCust_mobile(mCustomer.getMobile_num());
+                //mTransaction.setCust_mobile(CommonUtils.getHalfVisibleMobileNum(mCustomer.getMobile_num()));
                 // update cardId with cardNum
                 // mCustomer.getMembership_card() wont be null - as this would have been already verified in commonTxnProcessing()
                 /*if(mTransaction.getUsedCardId()==null || mTransaction.getUsedCardId().isEmpty()) {
