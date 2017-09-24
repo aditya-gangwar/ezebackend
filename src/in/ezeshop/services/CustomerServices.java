@@ -81,7 +81,11 @@ public class CustomerServices implements IBackendlessService {
             for(int i=0; i<csvFields.length; i++) {
 
                 // fetch all CB records for this customer in this table
-                String whereClause = "cust_private_id = '" + custPrivateId + "' AND updated > "+updatedSince;
+                String whereClause = "cust_private_id = '" + custPrivateId + "'";
+
+                if(updatedSince>0) {
+                    whereClause = whereClause + " AND updated > "+updatedSince;
+                }
                 mLogger.debug("whereClause: "+whereClause);
 
                 data = BackendOps.fetchCashback(whereClause,csvFields[i], false);
@@ -114,12 +118,12 @@ public class CustomerServices implements IBackendlessService {
                     // cashback rows available, but still some issue
                     throw new BackendlessException(String.valueOf(ErrorCodes.GENERAL_ERROR), "CB rows available, but failed to transform.");
                 }
-                if(updatedSince==0) {
+                /*if(updatedSince==0) {
                     // should have atleast single record created during registration
                     mEdr[BackendConstants.EDR_IGNORED_ERROR_IDX] = BackendConstants.IGNORED_ERROR_CUST_WITH_NO_CB_RECORD;
-                } else {
+                } else {*/
                     validException = true;
-                }
+                //}
                 throw new BackendlessException(String.valueOf(ErrorCodes.BL_ERROR_NO_DATA_FOUND), "");
             }
 
