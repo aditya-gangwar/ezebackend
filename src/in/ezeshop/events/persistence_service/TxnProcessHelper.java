@@ -1,6 +1,12 @@
 package in.ezeshop.events.persistence_service;
 
+import com.backendless.Backendless;
 import com.backendless.exceptions.BackendlessException;
+import com.backendless.messaging.DeliveryOptions;
+import com.backendless.messaging.PublishOptions;
+import com.backendless.messaging.PushBroadcastMask;
+import com.backendless.services.messaging.MessageStatus;
+import com.backendless.services.messaging.PublishStatusEnum;
 import in.ezeshop.common.CommonUtils;
 import in.ezeshop.common.CsvConverter;
 import in.ezeshop.common.MyGlobalSettings;
@@ -18,6 +24,7 @@ import java.util.*;
 
 import in.ezeshop.common.database.*;
 import in.ezeshop.common.constants.*;
+import weborb.exceptions.ServiceException;
 
 /**
  * Created by adgangwa on 13-05-2016.
@@ -102,7 +109,8 @@ public class TxnProcessHelper {
                 cashback = data.get(0);
 
                 // Integrity checks related to amount
-                if(mTransaction.getCl_debit() > (cashback.getCl_credit()-cashback.getCl_debit()) ) {
+                //if(mTransaction.getCl_debit() > (cashback.getCl_credit()-cashback.getCl_debit()) ) {
+                if(mTransaction.getCl_debit() > CommonUtils.getAccBalance(cashback) ) {
                     // already checked in app - so shouldn't reach here at first place
                     mEdr[BackendConstants.EDR_SPECIAL_FLAG_IDX] = BackendConstants.BACKEND_EDR_SECURITY_BREACH;
                     throw new BackendlessException(String.valueOf(ErrorCodes.ACCOUNT_NOT_ENUF_BALANCE), "");
@@ -188,8 +196,13 @@ public class TxnProcessHelper {
                         // no exception - means function execution success
                         mEdr[BackendConstants.EDR_RESULT_IDX] = BackendConstants.BACKEND_EDR_RESULT_OK;
 
-                    } catch (Exception ex) {
-                        BackendUtils.handleException(ex, false,mLogger,mEdr);
+                    } catch (Throwable ex) {
+                        if(ex instanceof Exception) {
+                            BackendUtils.handleException((Exception)ex, false, mLogger, mEdr);
+                        } else {
+                            mEdr[BackendConstants.EDR_RESULT_IDX] = BackendConstants.BACKEND_EDR_RESULT_NOK;
+                            mLogger.error("Exception in " + mEdr[BackendConstants.EDR_API_NAME_IDX] + ": " + ex.toString());
+                        }
                         // ignore and dont throw it
                     }
                 }
@@ -530,6 +543,7 @@ public class TxnProcessHelper {
             // Build SMS
             String smsText = buildSMS();
             if(smsText!=null) {
+                sendPushNotif("MyeCash Update",smsText,mCustomer.getMsgDevId());
                 // Send SMS through HTTP
                 SmsHelper.sendSMS(smsText,custMobile, mEdr, mLogger, true);
             }
@@ -569,6 +583,24 @@ public class TxnProcessHelper {
             sms = String.format(SmsConstants.SMS_TXN_DEBIT_CB,merchantName,cb_debit,txnDate,cl_balance,cb_balance);
         }*/
         return sms;
+    }
+
+    private void sendPushNotif(String title, String text, String devId) {
+        mLogger.debug("In sendPushNotif: " + devId);
+
+        DeliveryOptions deliveryOptions = new DeliveryOptions();
+        deliveryOptions.addPushSinglecast( devId );
+        //deliveryOptions.setPushBroadcast( PushBroadcastMask.ANDROID | PushBroadcastMask.IOS );
+        mLogger.debug("In sendPushNotif: 1");
+
+        PublishOptions publishOptions = new PublishOptions();
+        publishOptions.putHeader( "android-ticker-text", "You just got a private push notification!" );
+        publishOptions.putHeader( "android-content-title", title );
+        publishOptions.putHeader( "android-content-text", text );
+        mLogger.debug("In sendPushNotif: 2");
+
+        Backendless.Messaging.publish( "this is a private message!", publishOptions, deliveryOptions );
+        mLogger.debug("Notification sent: ");
     }
 
 }

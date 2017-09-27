@@ -592,44 +592,55 @@ public class BackendUtils {
         return new BackendlessException(be.getCode(),params.toCsvString());
     }
 
-    public static void handleException(Exception e, boolean validException, MyLogger logger, String[] edr) {
+    public static void handleException(Throwable e, boolean validException, MyLogger logger, String[] edr) {
         try {
-            // We are not able to mark all validExceptions - so checking again here
-            if(!validException) {
-                if (e instanceof BackendlessException) {
-                    // Below exceptions are considered valid and not logged
-                    int errorCode = Integer.valueOf( ((BackendlessException)e).getCode() );
-                    if( errorCode==ErrorCodes.FAILED_ATTEMPT_LIMIT_RCHD ||
-                            errorCode==ErrorCodes.USER_ACC_LOCKED ||
-                            errorCode==ErrorCodes.USER_ACC_DISABLED ) {
-                        validException = true;
+
+            if(e instanceof Error) {
+                // not exception, but JVM error
+                edr[BackendConstants.EDR_EXP_EXPECTED] = String.valueOf(false);
+                edr[BackendConstants.EDR_RESULT_IDX] = BackendConstants.BACKEND_EDR_RESULT_NOK;
+                logger.fatal("Exception in " + edr[BackendConstants.EDR_API_NAME_IDX] + ": " + e.toString());
+                logger.fatal(stackTraceStr(e));
+
+            } else {
+
+                // We are not able to mark all validExceptions - so checking again here
+                if (!validException) {
+                    if (e instanceof BackendlessException) {
+                        // Below exceptions are considered valid and not logged
+                        int errorCode = Integer.valueOf(((BackendlessException) e).getCode());
+                        if (errorCode == ErrorCodes.FAILED_ATTEMPT_LIMIT_RCHD ||
+                                errorCode == ErrorCodes.USER_ACC_LOCKED ||
+                                errorCode == ErrorCodes.USER_ACC_DISABLED) {
+                            validException = true;
+                        }
                     }
+                }
+
+                edr[BackendConstants.EDR_EXP_EXPECTED] = String.valueOf(validException);
+
+                if (validException) {
+                    edr[BackendConstants.EDR_RESULT_IDX] = BackendConstants.BACKEND_EDR_RESULT_OK;
+                    logger.debug(stackTraceStr(e));
+                } else {
+                    edr[BackendConstants.EDR_RESULT_IDX] = BackendConstants.BACKEND_EDR_RESULT_NOK;
+                    logger.error("Exception in " + edr[BackendConstants.EDR_API_NAME_IDX] + ": " + e.toString());
+                    logger.error(stackTraceStr(e));
+                }
+
+                //edr[BackendConstants.EDR_EXP_MSG_IDX] = e.getMessage().replaceAll(",", BackendConstants.BACKEND_EDR_SUB_DELIMETER);
+                edr[BackendConstants.EDR_EXP_MSG_IDX] = e.getMessage();
+                if (e instanceof BackendlessException) {
+                    String errCode = ((BackendlessException) e).getCode();
+                    edr[BackendConstants.EDR_EXP_CODE_IDX] = errCode;
+                    edr[BackendConstants.EDR_EXP_CODE_NAME] = ErrorCodes.appErrorNames.get(errCode);
+                } else {
+                    edr[BackendConstants.EDR_EXP_CODE_NAME] = e.getClass().getSimpleName();
+                    edr[BackendConstants.EDR_EXP_CODE_IDX] = edr[BackendConstants.EDR_EXP_CODE_NAME];
                 }
             }
 
-            edr[BackendConstants.EDR_EXP_EXPECTED] = String.valueOf(validException);
-
-            if (validException) {
-                edr[BackendConstants.EDR_RESULT_IDX] = BackendConstants.BACKEND_EDR_RESULT_OK;
-                logger.debug(stackTraceStr(e));
-            } else {
-                edr[BackendConstants.EDR_RESULT_IDX] = BackendConstants.BACKEND_EDR_RESULT_NOK;
-                logger.error("Exception in " + edr[BackendConstants.EDR_API_NAME_IDX] + ": " + e.toString());
-                logger.error(stackTraceStr(e));
-            }
-
-            //edr[BackendConstants.EDR_EXP_MSG_IDX] = e.getMessage().replaceAll(",", BackendConstants.BACKEND_EDR_SUB_DELIMETER);
-            edr[BackendConstants.EDR_EXP_MSG_IDX] = e.getMessage();
-            if (e instanceof BackendlessException) {
-                String errCode = ((BackendlessException) e).getCode();
-                edr[BackendConstants.EDR_EXP_CODE_IDX] = errCode;
-                edr[BackendConstants.EDR_EXP_CODE_NAME] = ErrorCodes.appErrorNames.get(errCode);
-            } else {
-                edr[BackendConstants.EDR_EXP_CODE_NAME] = e.getClass().getSimpleName();
-                edr[BackendConstants.EDR_EXP_CODE_IDX] = edr[BackendConstants.EDR_EXP_CODE_NAME];
-            }
-
-        } catch(Exception ex) {
+        } catch(Throwable ex) {
             logger.fatal("Exception in handleException: " + ex.toString());
             logger.fatal(stackTraceStr(ex));
         }
@@ -646,13 +657,13 @@ public class BackendUtils {
                 logger.edr(edr);
             }
             //logger.flush();
-        } catch(Exception e) {
+        } catch(Throwable e) {
             logger.fatal("Exception in finalHandling: " + e.toString());
             logger.fatal(stackTraceStr(e));
         }
     }
 
-    public static String stackTraceStr(Exception e) {
+    public static String stackTraceStr(Throwable e) {
         StringBuilder sb = new StringBuilder();
         for (StackTraceElement e1 : e.getStackTrace()) {
             sb.append("\t at ").append(e1.toString()).append(CommonConstants.NEWLINE_SEP);

@@ -259,6 +259,7 @@ public class BackendOps {
     }
 
     public static Customers updateCustomer(Customers customer) {
+        Backendless.Data.mapTableToClass("Customers", Customers.class);
         return Backendless.Persistence.save(customer);
     }
 

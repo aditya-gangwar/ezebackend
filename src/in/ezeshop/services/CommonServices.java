@@ -48,6 +48,61 @@ public class CommonServices implements IBackendlessService {
         }
     }
 
+    public String setMsgDeviceId(String userId, String deviceId) {
+        BackendUtils.initAll();
+        long startTime = System.currentTimeMillis();
+        mEdr[BackendConstants.EDR_START_TIME_IDX] = String.valueOf(startTime);
+        mEdr[BackendConstants.EDR_API_NAME_IDX] = "setMsgDeviceId";
+        mEdr[BackendConstants.EDR_API_PARAMS_IDX] = userId;
+
+        boolean validException = false;
+        try {
+            mLogger.debug("In setMsgDeviceId: "+userId);
+
+            // Send userType param as null to avoid checking within fetchCurrentUser fx.
+            // But check immediately after
+            Object userObj = BackendUtils.fetchCurrentUser(null, mEdr, mLogger, true);
+            int userType = Integer.parseInt(mEdr[BackendConstants.EDR_USER_TYPE_IDX]);
+
+            String devId = "";
+            if (userType == DbConstants.USER_TYPE_CUSTOMER) {
+                Customers customer = (Customers) userObj;
+                if (!customer.getMobile_num().equals(userId)) {
+                    mEdr[BackendConstants.EDR_SPECIAL_FLAG_IDX] = BackendConstants.BACKEND_EDR_SECURITY_BREACH;
+                    throw new BackendlessException(String.valueOf(ErrorCodes.WRONG_INPUT_DATA),
+                            "Provided Customer Id don't match: " + userId);
+                }
+                customer.setMsgDevId(deviceId);
+                customer = BackendOps.updateCustomer(customer);
+                devId = customer.getMsgDevId();
+
+            } else if (userType == DbConstants.USER_TYPE_MERCHANT) {
+                Merchants merchant = (Merchants) userObj;
+                if (!merchant.getAuto_id().equals(userId)) {
+                    mEdr[BackendConstants.EDR_SPECIAL_FLAG_IDX] = BackendConstants.BACKEND_EDR_SECURITY_BREACH;
+                    throw new BackendlessException(String.valueOf(ErrorCodes.WRONG_INPUT_DATA),
+                            "Provided Merchant Id don't match: " + userId);
+                }
+            } else if (userType == DbConstants.USER_TYPE_CC ||
+                    userType == DbConstants.USER_TYPE_AGENT) {
+                // TBD
+            } else {
+                mEdr[BackendConstants.EDR_SPECIAL_FLAG_IDX] = BackendConstants.BACKEND_EDR_SECURITY_BREACH;
+                throw new BackendlessException(String.valueOf(ErrorCodes.OPERATION_NOT_ALLOWED), "Operation not allowed to this user");
+            }
+
+            // no exception - means function execution success
+            mEdr[BackendConstants.EDR_RESULT_IDX] = BackendConstants.BACKEND_EDR_RESULT_OK;
+            return devId;
+
+        } catch (Exception e) {
+            BackendUtils.handleException(e, false, mLogger, mEdr);
+            throw e;
+        } finally {
+            BackendUtils.finalHandling(startTime, mLogger, mEdr);
+        }
+    }
+
     public void changePassword(String userId, String oldPasswd, String newPasswd) {
         BackendUtils.initAll();
         long startTime = System.currentTimeMillis();

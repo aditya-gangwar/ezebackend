@@ -31,7 +31,7 @@ import in.ezeshop.common.constants.*;
 public class MerchantServices implements IBackendlessService {
 
     private MyLogger mLogger = new MyLogger("services.MerchantServices");
-    private String[] mEdr = new String[BackendConstants.BACKEND_EDR_MAX_FIELDS];;
+    private String[] mEdr = new String[BackendConstants.BACKEND_EDR_MAX_FIELDS];
 
     /*
      * Public methods: Backend REST APIs
