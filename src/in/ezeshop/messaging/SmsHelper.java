@@ -33,6 +33,9 @@ public class SmsHelper {
             return true;
         }
         logger.debug("SMS: " + message);
+        if(recipients==null || recipients.isEmpty()) {
+            return false;
+        }
 
         HttpURLConnection uc = null;
         try {

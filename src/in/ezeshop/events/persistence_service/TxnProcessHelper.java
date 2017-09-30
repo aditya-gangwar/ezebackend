@@ -1,17 +1,12 @@
 package in.ezeshop.events.persistence_service;
 
-import com.backendless.Backendless;
 import com.backendless.exceptions.BackendlessException;
-import com.backendless.messaging.DeliveryOptions;
-import com.backendless.messaging.PublishOptions;
-import com.backendless.messaging.PushBroadcastMask;
-import com.backendless.messaging.MessageStatus;
-import com.backendless.messaging.PublishStatusEnum;
 import in.ezeshop.common.CommonUtils;
 import in.ezeshop.common.CsvConverter;
 import in.ezeshop.common.MyGlobalSettings;
 import in.ezeshop.constants.BackendConstants;
 import in.ezeshop.constants.DbConstantsBackend;
+import in.ezeshop.messaging.PushNotifier;
 import in.ezeshop.messaging.SmsHelper;
 import in.ezeshop.utilities.BackendOps;
 import in.ezeshop.utilities.SecurityHelper;
@@ -24,7 +19,6 @@ import java.util.*;
 
 import in.ezeshop.common.database.*;
 import in.ezeshop.common.constants.*;
-import weborb.exceptions.ServiceException;
 
 /**
  * Created by adgangwa on 13-05-2016.
@@ -192,7 +186,7 @@ public class TxnProcessHelper {
 
                 if(sendSMS) {
                     try {
-                        buildAndSendTxnSMS();
+                        buildAndSendTxnMsgs();
                         // no exception - means function execution success
                         mEdr[BackendConstants.EDR_RESULT_IDX] = BackendConstants.BACKEND_EDR_RESULT_OK;
 
@@ -246,7 +240,7 @@ public class TxnProcessHelper {
             //mLogger.debug("In Transaction handleAfterCreate");
             // If transaction creation successful send SMS to mCustomer
             if(result.getException()==null) {
-                buildAndSendTxnSMS();
+                buildAndSendTxnMsgs();
                 mEdr[BackendConstants.EDR_RESULT_IDX] = BackendConstants.BACKEND_EDR_RESULT_OK;
             } else {
                 mEdr[BackendConstants.EDR_EXP_CODE_IDX] = String.valueOf(result.getException().getCode());
@@ -512,45 +506,39 @@ public class TxnProcessHelper {
         return null;
     }*/
 
-    private void buildAndSendTxnSMS()
+    private void buildAndSendTxnMsgs()
     {
-        String custMobile = mTransaction.getCust_mobile();
-        //String txnId = mTransaction.getTrans_id();
-        //mLogger.debug("Transaction update was successful: "+custMobile+", "+txnId);
-
         cl_credit = mTransaction.getCl_credit();
         cb_credit = mTransaction.getCb_credit() + mTransaction.getExtra_cb_credit();
         cl_debit = mTransaction.getCl_debit();
         cl_overdraft = mTransaction.getCl_overdraft();
-        //cb_debit = mTransaction.getCb_debit();
 
-        // Send SMS only in cases of 'redeem > INR 10' and 'add cash in account'
-        if( cl_debit > BackendConstants.SEND_TXN_SMS_CL_MIN_AMOUNT
-                || cl_overdraft > 0
-                || cl_credit > BackendConstants.SEND_TXN_SMS_CL_MIN_AMOUNT
-//                || cb_debit > BackendConstants.SEND_TXN_SMS_CB_MIN_AMOUNT
-                ) {
-            Cashback cashback = mTransaction.getCashback();
-            merchantName = mTransaction.getMerchant_name().toUpperCase(Locale.ENGLISH);
-//            cb_balance = cashback.getCb_credit() - cashback.getCb_debit();
-//            cl_balance = cashback.getCl_credit() - cashback.getCl_debit();
-            cl_balance = CommonUtils.getAccBalance(cashback);
+        // Build Msg Text
+        Cashback cashback = mTransaction.getCashback();
+        merchantName = mTransaction.getMerchant_name().toUpperCase(Locale.ENGLISH);
+        cl_balance = CommonUtils.getAccBalance(cashback);
+        SimpleDateFormat sdf = new SimpleDateFormat(CommonConstants.DATE_FORMAT_ONLY_DATE_BACKEND, CommonConstants.DATE_LOCALE);
+        sdf.setTimeZone(TimeZone.getTimeZone(CommonConstants.TIMEZONE));
+        txnDate = sdf.format(mTransaction.getCreate_time());
 
-            SimpleDateFormat sdf = new SimpleDateFormat(CommonConstants.DATE_FORMAT_ONLY_DATE_BACKEND, CommonConstants.DATE_LOCALE);
-            sdf.setTimeZone(TimeZone.getTimeZone(CommonConstants.TIMEZONE));
-            txnDate = sdf.format(mTransaction.getCreate_time());
+        String text = buildMsg();
+        if(text!=null) {
 
-            // Build SMS
-            String smsText = buildSMS();
-            if(smsText!=null) {
-                sendPushNotif("MyeCash Update",smsText,mCustomer.getMsgDevId());
+            // Always send the Push Notification to Customer
+            PushNotifier.pushNotification(text,text,mCustomer.getMsgDevId(),mEdr,mLogger);
+
+            // Send SMS only in cases of 'debit' or 'add cash' > configured amounts
+            if( cl_debit > BackendConstants.SEND_TXN_SMS_CL_MIN_AMOUNT
+                    || cl_overdraft > 0
+                    || cl_credit > BackendConstants.SEND_TXN_SMS_CL_MIN_AMOUNT
+                    ) {
                 // Send SMS through HTTP
-                SmsHelper.sendSMS(smsText,custMobile, mEdr, mLogger, true);
+                SmsHelper.sendSMS(text,mCustomer.getMobile_num(), mEdr, mLogger, true);
             }
         }
     }
 
-    private String buildSMS() {
+    private String buildMsg() {
         String sms=null;
 
         if(cl_debit> BackendConstants.SEND_TXN_SMS_CL_MIN_AMOUNT && cl_overdraft <= 0) {
@@ -583,24 +571,6 @@ public class TxnProcessHelper {
             sms = String.format(SmsConstants.SMS_TXN_DEBIT_CB,merchantName,cb_debit,txnDate,cl_balance,cb_balance);
         }*/
         return sms;
-    }
-
-    private void sendPushNotif(String title, String text, String devId) {
-        mLogger.debug("In sendPushNotif: " + devId);
-
-        DeliveryOptions deliveryOptions = new DeliveryOptions();
-        deliveryOptions.addPushSinglecast( devId );
-        //deliveryOptions.setPushBroadcast( PushBroadcastMask.ANDROID | PushBroadcastMask.IOS );
-        mLogger.debug("In sendPushNotif: 1");
-
-        PublishOptions publishOptions = new PublishOptions();
-        publishOptions.putHeader( "android-ticker-text", "You just got a private push notification!" );
-        publishOptions.putHeader( "android-content-title", title );
-        publishOptions.putHeader( "android-content-text", text );
-        mLogger.debug("In sendPushNotif: 2");
-
-        Backendless.Messaging.publish( "this is a private message!", publishOptions, deliveryOptions );
-        mLogger.debug("Notification sent: ");
     }
 
 }

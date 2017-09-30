@@ -75,7 +75,7 @@ public class SmsConstants {
     public static String SMS_REG_CUST_OTP = "Please use OTP %s to register to MyeCash Rewards Program. You can check more program details and terms at http://www.myecash.in.";
     public static String SMS_LOGIN_OTP = "Login attempt detected from Unknown Device. Use OTP '%s' to add it as 'Trusted Device' for your account '%s'. PLS CALL CUSTOMER CARE IF NOT REQUESTED BY YOU.";
     public static String SMS_CHANGE_MOB_OTP = "Use OTP %s to verify this Mobile number. PLS CALL CUSTOMER CARE IF NOT REQUESTED BY YOU.";
-    public static String SMS_NEW_CARD_OTP = "Use OTP %s to authenticate new Membership Card for account %s. PLS CALL CUSTOMER CARE IF NOT REQUESTED BY YOU.";
+    //public static String SMS_NEW_CARD_OTP = "Use OTP %s to authenticate new Membership Card for account %s. PLS CALL CUSTOMER CARE IF NOT REQUESTED BY YOU.";
     public static String SMS_PIN_RESET_OTP = "Use OTP %s to authenticate PIN Reset for customer account %s. PLS CALL CUSTOMER CARE IF NOT REQUESTED BY YOU.";
     public static String TXN_COMMIT_OTP = "Use OTP %s to authenticate your transaction at %s. PLS CALL CUSTOMER CARE IF NOT REQUESTED BY YOU.";
 
@@ -92,7 +92,7 @@ public class SmsConstants {
 
     // Mobile/Card change messages
     public static String SMS_MOBILE_CHANGE = "Registered Mobile number of your MyeCash account '%s' is changed successfully to '%s'. PLS CALL CUSTOMER IMMEDIATELY IF NOT DONE BY YOU.";
-    public static String SMS_CUSTOMER_NEW_CARD = "You have registered new card with number %s to your account %s. PLS CALL CUSTOMER IMMEDIATELY IF NOT DONE BY YOU.";
-    public static String SMS_DISABLE_CARD = "Dear %s - Your MyeCash Customer Card bearing number '%s' is Disabled now. Please get new Card from any MyeCash Merchant.";
+    //public static String SMS_CUSTOMER_NEW_CARD = "You have registered new card with number %s to your account %s. PLS CALL CUSTOMER IMMEDIATELY IF NOT DONE BY YOU.";
+    //public static String SMS_DISABLE_CARD = "Dear %s - Your MyeCash Customer Card bearing number '%s' is Disabled now. Please get new Card from any MyeCash Merchant.";
 
 }
