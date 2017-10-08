@@ -193,6 +193,9 @@ public class GenericUserEventHandler extends com.backendless.servercode.extensio
                     // remove common sensitive info from the object
                     customer.setTxn_pin("");
                     customer.setNamak("");
+                    // 'addresses' is not actually stored in DB
+                    // this field only acts as transport - so as customer dont have to do another query for it
+                    customer.setAddresses(BackendOps.fetchCustAddresses(customer.getPrivate_id()));
                     result.getResult().put("customer", customer);
 
                 } else if (userType == DbConstants.USER_TYPE_AGENT ||

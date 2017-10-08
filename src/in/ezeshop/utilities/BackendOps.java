@@ -1118,6 +1118,34 @@ public class BackendOps {
         return Backendless.Data.of( CustomerCards.class ).find(query).getData();
     }*/
 
+    /*
+     * Customer Address functions
+     */
+    public static List<CustAddress> fetchCustAddresses(String privateId) {
+        Backendless.Data.mapTableToClass("CustAddress", CustAddress.class);
+        BackendlessDataQuery query = new BackendlessDataQuery();
+        query.setWhereClause("custPrivateId = '"+privateId+"'");
+
+        QueryOptions queryOptions = new QueryOptions();
+        queryOptions.addRelated("area");
+        queryOptions.addRelated("area.city");
+        query.setQueryOptions(queryOptions);
+
+        BackendlessCollection<CustAddress> collection = Backendless.Data.of( CustAddress.class ).find(query);
+        int cnt = collection.getTotalObjects();
+        if( cnt == 0) {
+            // No matching merchant order is not an error
+            return null;
+        }
+
+        List<CustAddress> objects = new ArrayList<>();
+        while (collection.getCurrentPage().size() > 0)
+        {
+            objects.addAll(collection.getData());
+            collection = collection.nextPage();
+        }
+        return objects;
+    }
 
     /*
      * Bulk Operations via REST
