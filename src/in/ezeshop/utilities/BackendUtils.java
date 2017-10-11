@@ -71,6 +71,13 @@ public class BackendUtils {
         return new String(id);
     }
 
+    public static String generateCustAddrId(String custPrivId) {
+        // Id : <6 chars for customer private id> + <6 char for own epoch time in 10 secs block> = total 12 chars
+        long timeSecs = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
+        long myTimeSecs = Math.round((timeSecs - CommonConstants.START_EPOCH_SECS) / 10);
+        return custPrivId + Base35.fromBase10(myTimeSecs, 6);
+    }
+
     /*public static String generateMchntOrderId() {
         mSdfTimeDay.setTimeZone(TimeZone.getTimeZone(CommonConstants.TIMEZONE));
         String day = mSdfTimeDay.format(new Date());

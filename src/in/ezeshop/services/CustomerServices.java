@@ -30,6 +30,68 @@ public class CustomerServices implements IBackendlessService {
      * Public methods: Backend REST APIs
      * Customer operations
      */
+    public List<CustAddress> saveCustAddress(CustAddress addr, Boolean setAsDefault) {
+        long startTime = System.currentTimeMillis();
+        mEdr[BackendConstants.EDR_START_TIME_IDX] = String.valueOf(startTime);
+        mEdr[BackendConstants.EDR_API_NAME_IDX] = "updateCustAddress";
+
+        boolean validException = false;
+        try {
+            mLogger.debug("In updateCustAddress");
+
+            // Only customer allowed to update address - internal user also not allowed
+            Customers customer = (Customers) BackendUtils.fetchCurrentUser(DbConstants.USER_TYPE_CUSTOMER, mEdr, mLogger, false);
+            mEdr[BackendConstants.EDR_CUST_ID_IDX] = customer.getPrivate_id();
+
+            if(!customer.getPrivate_id().equals(addr.getCustPrivateId())) {
+                mEdr[BackendConstants.EDR_SPECIAL_FLAG_IDX] = BackendConstants.BACKEND_EDR_SECURITY_BREACH;
+                throw new BackendlessException(String.valueOf(ErrorCodes.OPERATION_NOT_ALLOWED), "Operation not allowed to this user");
+            }
+
+            CustAddress addrToSave = null;
+            // Check if edit case
+            if(addr.getId()!=null && !addr.getId().isEmpty()) {
+                mLogger.debug("Cust Address edit case: "+addr.getId());
+                // Fetch corresponding custAddress record from DB
+                CustAddress addrDb = BackendOps.getAddress(addr.getId());
+                // copy all fields
+                addrDb.setArea(addr.getArea());
+                addrDb.setContactNum(addr.getContactNum());
+                addrDb.setText1(addr.getText1());
+                addrDb.setToName(addr.getToName());
+                addrToSave = addrDb;
+            } else {
+                mLogger.debug("Cust Address add case");
+                // Add case - generate id
+                addr.setId(BackendUtils.generateCustAddrId(customer.getPrivate_id()));
+                addrToSave = addr;
+            }
+
+            addrToSave = BackendOps.saveCustAddress(addrToSave);
+
+            try {
+                if(setAsDefault) {
+                    customer.setDefaultAddressId(addrToSave.getId());
+                    BackendOps.updateCustomer(customer);
+                }
+            } catch (Exception e) {
+                // ignore
+                mLogger.error("CustomerServices.updateCustAddress: Failed to set as default address: "+
+                        customer.getPrivate_id()+", "+addrToSave.getId(),e);
+                mEdr[BackendConstants.EDR_IGNORED_ERROR_IDX] = BackendConstants.IGNORED_ERROR_CUST_ADDR_DEFAULT;
+            }
+
+            mEdr[BackendConstants.EDR_RESULT_IDX] = BackendConstants.BACKEND_EDR_RESULT_OK;
+            return BackendOps.fetchCustAddresses(customer.getPrivate_id());
+
+        } catch(Exception e) {
+            BackendUtils.handleException(e,validException,mLogger,mEdr);
+            throw e;
+        } finally {
+            BackendUtils.finalHandling(startTime,mLogger,mEdr);
+        }
+    }
+
     public List<Cashback> getCashbacks(String custPrivateId, long updatedSince) {
 
         BackendUtils.initAll();

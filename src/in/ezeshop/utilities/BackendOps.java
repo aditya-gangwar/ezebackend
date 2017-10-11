@@ -1147,6 +1147,31 @@ public class BackendOps {
         return objects;
     }
 
+    public static CustAddress getAddress(String id) {
+        Backendless.Data.mapTableToClass("CustAddress", CustAddress.class);
+        BackendlessDataQuery query = new BackendlessDataQuery();
+        query.setWhereClause("id = '"+id+"'");
+
+        QueryOptions queryOptions = new QueryOptions();
+        queryOptions.addRelated("area");
+        queryOptions.addRelated("area.city");
+        query.setQueryOptions(queryOptions);
+
+        BackendlessCollection<CustAddress> addr = Backendless.Data.of( CustAddress.class ).find(query);
+        if( addr.getTotalObjects() == 0) {
+            String errorMsg = "No Cust Address found: "+query.getWhereClause();
+            throw new BackendlessException(String.valueOf(ErrorCodes.NO_DATA_FOUND), errorMsg);
+        } else {
+            return addr.getData().get(0);
+        }
+    }
+
+    public static CustAddress saveCustAddress(CustAddress addr) {
+        Backendless.Data.mapTableToClass("CustAddress", CustAddress.class);
+        return Backendless.Persistence.save(addr);
+    }
+
+
     /*
      * Bulk Operations via REST
      */
@@ -1215,6 +1240,4 @@ public class BackendOps {
             return -1;
         }
     }
-
-
 }

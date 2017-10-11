@@ -68,6 +68,7 @@ public class BackendConstants {
     public static final String IGNORED_ERROR_CUST_WITH_NO_CB_RECORD = "custWithNoCbRecord";
     public static final String IGNORED_ERROR_CB_WITH_NO_CUST = "cbWithNoLinkedCust";
     public static final String IGNORED_ERROR_CB_WITH_NO_MCHNT = "cbWithNoValidMchnt";
+    public static final String IGNORED_ERROR_CUST_ADDR_DEFAULT = "custAddrDefaultFailed";
 
     // array indexes giving position of EDR fields
     public static final int EDR_API_NAME_IDX = 0;
