@@ -868,6 +868,7 @@ public class MerchantServices implements IBackendlessService {
         customer.setAdmin_status(DbConstants.USER_STATUS_ACTIVE);
         customer.setStatus_reason(DbConstantsBackend.ENABLED_ACTIVE);
         customer.setStatus_update_time(new Date());
+        customer.setCity("");
         //customer.setLastRenewDate(new Date());
 
         // get customer counter value and encode the same to get customer private id

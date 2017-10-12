@@ -64,6 +64,12 @@ public class CustomerServices implements IBackendlessService {
                 mLogger.debug("Cust Address add case");
                 // Add case - generate id
                 addr.setId(BackendUtils.generateCustAddrId(customer.getPrivate_id()));
+                if(addr.getArea().getId()==null || addr.getArea().getId().isEmpty()) {
+                    mLogger.debug("New Area case: "+addr.getArea().getAreaName());
+                    // New area case
+                    addr.getArea().setId(BackendUtils.generateAreaId());
+                    addr.getArea().setValidated(false);
+                }
                 addrToSave = addr;
             }
 

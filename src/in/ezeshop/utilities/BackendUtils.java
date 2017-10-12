@@ -78,6 +78,11 @@ public class BackendUtils {
         return custPrivId + Base35.fromBase10(myTimeSecs, 6);
     }
 
+    public static String generateAreaId() {
+        // Id : millisecs as Base35
+        return Base35.fromBase10((System.currentTimeMillis()-CommonConstants.START_EPOCH_MILLI_SECS), 0);
+    }
+
     /*public static String generateMchntOrderId() {
         mSdfTimeDay.setTimeZone(TimeZone.getTimeZone(CommonConstants.TIMEZONE));
         String day = mSdfTimeDay.format(new Date());
