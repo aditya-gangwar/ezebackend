@@ -3,9 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="ebc44ac1-614c-4d02-a020-2866a6df6bea" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/in/ezeshop/events/user_service/GenericUserEventHandler.java" afterPath="$PROJECT_DIR$/src/in/ezeshop/events/user_service/GenericUserEventHandler.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/in/ezeshop/services/CustomerServices.java" afterPath="$PROJECT_DIR$/src/in/ezeshop/services/CustomerServices.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/in/ezeshop/services/MerchantServices.java" afterPath="$PROJECT_DIR$/src/in/ezeshop/services/MerchantServices.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/in/ezeshop/utilities/BackendUtils.java" afterPath="$PROJECT_DIR$/src/in/ezeshop/utilities/BackendUtils.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/in/ezeshop/utilities/BackendOps.java" afterPath="$PROJECT_DIR$/src/in/ezeshop/utilities/BackendOps.java" />
     </list>
     <ignored path="ezebackend.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -27,21 +27,21 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="MerchantServices.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="MerchantServices.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/in/ezeshop/services/MerchantServices.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="327">
-              <caret line="870" column="26" selection-start-line="870" selection-start-column="26" selection-end-line="870" selection-end-column="26" />
+            <state relative-caret-position="0">
+              <caret line="854" column="52" selection-start-line="854" selection-start-column="52" selection-end-line="854" selection-end-column="52" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="CustomerServices.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="CustomerServices.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/in/ezeshop/services/CustomerServices.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="578">
-              <caret line="90" column="39" selection-start-line="90" selection-start-column="39" selection-end-line="90" selection-end-column="39" />
+            <state relative-caret-position="385">
+              <caret line="82" column="0" selection-start-line="82" selection-start-column="0" selection-end-line="82" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -50,8 +50,43 @@
       <file leaf-file-name="BackendUtils.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/in/ezeshop/utilities/BackendUtils.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="544">
-              <caret line="80" column="40" selection-start-line="80" selection-start-column="40" selection-end-line="80" selection-end-column="40" />
+            <state relative-caret-position="242">
+              <caret line="160" column="0" selection-start-line="160" selection-start-column="0" selection-end-line="160" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="GenericUserEventHandler.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/in/ezeshop/events/user_service/GenericUserEventHandler.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="420">
+              <caret line="198" column="105" selection-start-line="198" selection-start-column="105" selection-end-line="198" selection-end-column="105" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="BackendOps.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/in/ezeshop/utilities/BackendOps.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="578">
+              <caret line="1202" column="13" selection-start-line="1202" selection-start-column="13" selection-end-line="1202" selection-end-column="13" />
+              <folding>
+                <marker date="1508362454919" expanded="false" signature="11137:11148" ph=" { " />
+                <marker date="1508362454919" expanded="false" signature="11192:11198" ph=" }" />
+                <marker date="1508362454919" expanded="false" signature="43357:43368" ph=" { " />
+                <marker date="1508362454919" expanded="false" signature="43413:43419" ph=" }" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="CustAddress.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../ezeshop/common/src/main/java/in/ezeshop/common/database/CustAddress.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="119">
+              <caret line="12" column="30" selection-start-line="12" selection-start-column="17" selection-end-line="12" selection-end-column="30" />
               <folding />
             </state>
           </provider>
@@ -62,7 +97,10 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="238">
               <caret line="14" column="53" selection-start-line="14" selection-start-column="48" selection-end-line="14" selection-end-column="53" />
-              <folding />
+              <folding>
+                <element signature="e#1349#1350#0" expanded="false" />
+                <element signature="e#1401#1402#0" expanded="false" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -107,13 +145,13 @@
         <option value="$PROJECT_DIR$/src/in/ezeshop/messaging/PushNotifier.java" />
         <option value="$PROJECT_DIR$/src/in/ezeshop/messaging/SmsHelper.java" />
         <option value="$PROJECT_DIR$/src/in/ezeshop/events/persistence_service/TxnProcessHelper.java" />
-        <option value="$PROJECT_DIR$/src/in/ezeshop/events/user_service/GenericUserEventHandler.java" />
-        <option value="$PROJECT_DIR$/src/in/ezeshop/utilities/BackendOps.java" />
         <option value="$PROJECT_DIR$/src/in/ezeshop/constants/BackendConstants.java" />
         <option value="$PROJECT_DIR$/src/in/ezeshop/services/MerchantServices.java" />
         <option value="$PROJECT_DIR$/../ezeshop/common/src/main/java/in/ezeshop/common/constants/CommonConstants.java" />
         <option value="$PROJECT_DIR$/../ezeshop/common/src/main/java/in/ezeshop/common/database/Areas.java" />
         <option value="$PROJECT_DIR$/src/in/ezeshop/utilities/BackendUtils.java" />
+        <option value="$PROJECT_DIR$/src/in/ezeshop/events/user_service/GenericUserEventHandler.java" />
+        <option value="$PROJECT_DIR$/src/in/ezeshop/utilities/BackendOps.java" />
         <option value="$PROJECT_DIR$/src/in/ezeshop/services/CustomerServices.java" />
       </list>
     </option>
@@ -150,7 +188,6 @@
     </navigator>
     <panes>
       <pane id="PackagesPane" />
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -159,9 +196,20 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
           </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ezebackend" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
         </subPane>
       </pane>
       <pane id="Scratches" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -489,7 +537,14 @@
       <option name="project" value="LOCAL" />
       <updated>1507756150637</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="12 Oct">
+      <created>1507824599208</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1507824599208</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -504,22 +559,22 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32891247" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2743553" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.26289397" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32891247" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
   <component name="Vcs.Log.UiProperties">
@@ -541,7 +596,8 @@
     <MESSAGE value="23 Sep" />
     <MESSAGE value="01 Oct" />
     <MESSAGE value="07 Oct" />
-    <option name="LAST_COMMIT_MESSAGE" value="07 Oct" />
+    <MESSAGE value="12 Oct" />
+    <option name="LAST_COMMIT_MESSAGE" value="12 Oct" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -657,7 +713,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="159">
           <caret line="227" column="110" selection-start-line="227" selection-start-column="110" selection-end-line="227" selection-end-column="110" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -679,9 +734,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="493">
           <caret line="52" column="0" selection-start-line="52" selection-start-column="0" selection-end-line="52" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -712,7 +764,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="242">
           <caret line="79" column="73" selection-start-line="79" selection-start-column="73" selection-end-line="79" selection-end-column="73" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -756,7 +807,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="242">
           <caret line="230" column="60" selection-start-line="230" selection-start-column="60" selection-end-line="230" selection-end-column="60" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -815,29 +865,10 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/../ezeshop/common/src/main/java/in/ezeshop/common/database/MyAreas.java" />
-    <entry file="file://$PROJECT_DIR$/src/in/ezeshop/events/user_service/GenericUserEventHandler.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3077">
-          <caret line="196" column="110" selection-start-line="196" selection-start-column="110" selection-end-line="196" selection-end-column="110" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../ezeshop/common/src/main/java/in/ezeshop/common/database/CustAddress.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="272">
-          <caret line="19" column="0" selection-start-line="19" selection-start-column="0" selection-end-line="19" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://C:/Program Files/Java/jdk1.8.0_77/src.zip!/java/lang/Math.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="446">
           <caret line="666" column="22" selection-start-line="666" selection-start-column="22" selection-end-line="666" selection-end-column="22" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -853,7 +884,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="446">
           <caret line="352" column="30" selection-start-line="352" selection-start-column="30" selection-end-line="352" selection-end-column="30" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -869,54 +899,70 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="238">
           <caret line="14" column="53" selection-start-line="14" selection-start-column="48" selection-end-line="14" selection-end-column="53" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../ezeshop/common/src/main/java/in/ezeshop/common/database/Areas.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="544">
-          <caret line="57" column="17" selection-start-line="57" selection-start-column="17" selection-end-line="57" selection-end-column="17" />
           <folding>
-            <element signature="e#1077#1078#0" expanded="true" />
-            <element signature="e#1096#1097#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/in/ezeshop/utilities/BackendUtils.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="544">
-          <caret line="80" column="40" selection-start-line="80" selection-start-column="40" selection-end-line="80" selection-end-column="40" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/in/ezeshop/services/CustomerServices.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="578">
-          <caret line="90" column="39" selection-start-line="90" selection-start-column="39" selection-end-line="90" selection-end-column="39" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/in/ezeshop/utilities/BackendOps.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="242">
-          <caret line="1123" column="36" selection-start-line="1123" selection-start-column="36" selection-end-line="1123" selection-end-column="36" />
-          <folding>
-            <marker date="1507752079680" expanded="false" signature="11125:11136" ph=" { " />
-            <marker date="1507752079680" expanded="false" signature="11180:11186" ph=" }" />
-            <marker date="1507752079680" expanded="false" signature="43345:43356" ph=" { " />
-            <marker date="1507752079680" expanded="false" signature="43401:43407" ph=" }" />
+            <element signature="e#1349#1350#0" expanded="false" />
+            <element signature="e#1401#1402#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/in/ezeshop/services/MerchantServices.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="327">
-          <caret line="870" column="26" selection-start-line="870" selection-start-column="26" selection-end-line="870" selection-end-column="26" />
+        <state relative-caret-position="0">
+          <caret line="854" column="52" selection-start-line="854" selection-start-column="52" selection-end-line="854" selection-end-column="52" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../ezeshop/common/src/main/java/in/ezeshop/common/database/Areas.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="170">
+          <caret line="15" column="19" selection-start-line="15" selection-start-column="17" selection-end-line="15" selection-end-column="19" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../ezeshop/common/src/main/java/in/ezeshop/common/database/CustAddress.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="119">
+          <caret line="12" column="30" selection-start-line="12" selection-start-column="17" selection-end-line="12" selection-end-column="30" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/in/ezeshop/events/user_service/GenericUserEventHandler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="420">
+          <caret line="198" column="105" selection-start-line="198" selection-start-column="105" selection-end-line="198" selection-end-column="105" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/in/ezeshop/utilities/BackendUtils.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="242">
+          <caret line="160" column="0" selection-start-line="160" selection-start-column="0" selection-end-line="160" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/in/ezeshop/utilities/BackendOps.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="578">
+          <caret line="1202" column="13" selection-start-line="1202" selection-start-column="13" selection-end-line="1202" selection-end-column="13" />
+          <folding>
+            <marker date="1508362454919" expanded="false" signature="11137:11148" ph=" { " />
+            <marker date="1508362454919" expanded="false" signature="11192:11198" ph=" }" />
+            <marker date="1508362454919" expanded="false" signature="43357:43368" ph=" { " />
+            <marker date="1508362454919" expanded="false" signature="43413:43419" ph=" }" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/in/ezeshop/services/CustomerServices.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="385">
+          <caret line="82" column="0" selection-start-line="82" selection-start-column="0" selection-end-line="82" selection-end-column="0" />
           <folding />
         </state>
       </provider>

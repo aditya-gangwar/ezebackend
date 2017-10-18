@@ -5,6 +5,7 @@ import com.backendless.BackendlessCollection;
 import com.backendless.BackendlessUser;
 import com.backendless.exceptions.BackendlessException;
 import com.backendless.exceptions.BackendlessFault;
+import com.backendless.logging.Logger;
 import com.backendless.persistence.BackendlessDataQuery;
 import com.backendless.persistence.QueryOptions;
 import in.ezeshop.common.MyGlobalSettings;
@@ -15,15 +16,14 @@ import in.ezeshop.constants.DbConstantsBackend;
 import in.ezeshop.database.*;
 import in.ezeshop.messaging.SmsHelper;
 
+import java.awt.geom.Area;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static in.ezeshop.utilities.BackendUtils.getMerchantIdType;
 
@@ -1121,21 +1121,22 @@ public class BackendOps {
     /*
      * Customer Address functions
      */
-    public static List<CustAddress> fetchCustAddresses(String privateId) {
+    public static List<CustAddress> fetchCustAddresses(String privateId, MyLogger logger) {
         Backendless.Data.mapTableToClass("CustAddress", CustAddress.class);
         BackendlessDataQuery query = new BackendlessDataQuery();
         query.setWhereClause("custPrivateId = '"+privateId+"'");
 
-        QueryOptions queryOptions = new QueryOptions();
+        /*QueryOptions queryOptions = new QueryOptions();
         queryOptions.addRelated("area");
         queryOptions.addRelated("area.city");
-        query.setQueryOptions(queryOptions);
+        query.setQueryOptions(queryOptions);*/
 
         BackendlessCollection<CustAddress> collection = Backendless.Data.of( CustAddress.class ).find(query);
         int cnt = collection.getTotalObjects();
         if( cnt == 0) {
-            // No matching merchant order is not an error
             return null;
+        } else {
+            logger.debug("Fetched Cust Addresses: "+cnt);
         }
 
         List<CustAddress> objects = new ArrayList<>();
@@ -1144,6 +1145,19 @@ public class BackendOps {
             objects.addAll(collection.getData());
             collection = collection.nextPage();
         }
+
+        // fetch area objects, and attach to 'custAddress' objects
+        String[] areaIds = new String[CommonConstants.MAX_ADDRESS_PER_CUSTOMER];
+        int i = 0;
+        for (CustAddress addr: objects) {
+            areaIds[i] = addr.getAreaId();
+            i++;
+        }
+        HashMap<String, Areas> areas = fetchAreas(areaIds, logger);
+        for (CustAddress addr: objects) {
+            addr.setArea(areas.get(addr.getAreaId()));
+        }
+
         return objects;
     }
 
@@ -1152,10 +1166,10 @@ public class BackendOps {
         BackendlessDataQuery query = new BackendlessDataQuery();
         query.setWhereClause("id = '"+id+"'");
 
-        QueryOptions queryOptions = new QueryOptions();
+        /*QueryOptions queryOptions = new QueryOptions();
         queryOptions.addRelated("area");
         queryOptions.addRelated("area.city");
-        query.setQueryOptions(queryOptions);
+        query.setQueryOptions(queryOptions);*/
 
         BackendlessCollection<CustAddress> addr = Backendless.Data.of( CustAddress.class ).find(query);
         if( addr.getTotalObjects() == 0) {
@@ -1170,6 +1184,60 @@ public class BackendOps {
         Backendless.Data.mapTableToClass("CustAddress", CustAddress.class);
         return Backendless.Persistence.save(addr);
     }
+
+    /*
+     * Area functions
+     */
+    public static HashMap<String, Areas> fetchAreas(String[] idList, MyLogger logger) {
+        Backendless.Data.mapTableToClass("Areas", Areas.class);
+
+        // build where clause
+        String whereClause = null;
+        for (String id : idList) {
+            if(id!=null) {
+                if (whereClause == null) {
+                    whereClause = "id = '" + id + "'";
+                } else {
+                    whereClause = whereClause + " OR id = '" + id + "'";
+                }
+            }
+        }
+
+        BackendlessDataQuery query = new BackendlessDataQuery();
+        if(whereClause!=null) {
+            logger.debug("fetchAreas: whereClause: "+whereClause);
+            query.setWhereClause(whereClause);
+        }
+
+        QueryOptions queryOptions = new QueryOptions();
+        queryOptions.addRelated("city");
+        query.setQueryOptions(queryOptions);
+
+        BackendlessCollection<Areas> collection = Backendless.Data.of( Areas.class ).find(query);
+        int cnt = collection.getTotalObjects();
+        if( cnt == 0) {
+            String errorMsg = "No Areas found: "+query.getWhereClause();
+            throw new BackendlessException(String.valueOf(ErrorCodes.NO_DATA_FOUND), errorMsg);
+        }
+
+        HashMap<String, Areas> objects = new HashMap<>();
+        while (collection.getCurrentPage().size() > 0)
+        {
+            Iterator<Areas> iterator = collection.getCurrentPage().iterator();
+            while (iterator.hasNext()) {
+                Areas item = iterator.next();
+                objects.put(item.getId(), item);
+            }
+            collection = collection.nextPage();
+        }
+        return objects;
+    }
+
+    public static Areas saveArea(Areas area) {
+        Backendless.Data.mapTableToClass("Areas", Areas.class);
+        return Backendless.Persistence.save(area);
+    }
+
 
 
     /*

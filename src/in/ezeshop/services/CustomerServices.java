@@ -37,7 +37,7 @@ public class CustomerServices implements IBackendlessService {
 
         boolean validException = false;
         try {
-            mLogger.debug("In updateCustAddress");
+            mLogger.debug("In saveCustAddress: "+addr.getArea().getValidated()+", "+setAsDefault);
 
             // Only customer allowed to update address - internal user also not allowed
             Customers customer = (Customers) BackendUtils.fetchCurrentUser(DbConstants.USER_TYPE_CUSTOMER, mEdr, mLogger, false);
@@ -48,14 +48,27 @@ public class CustomerServices implements IBackendlessService {
                 throw new BackendlessException(String.valueOf(ErrorCodes.OPERATION_NOT_ALLOWED), "Operation not allowed to this user");
             }
 
+            mLogger.debug("Mark1: "+addr.getArea().getValidated()+", "+addr.getArea().getAreaName()+", "+addr.getArea().getCity().getCity());
+
+            // First check if area is to be saved
+            if(addr.getArea().getId()==null || addr.getArea().getId().isEmpty()) {
+                mLogger.debug("New Area case: "+addr.getArea().getAreaName());
+                // New area - add to DB first
+                Areas area = addr.getArea();
+                area.setId(BackendUtils.generateAreaId());
+                area.setValidated(false);
+                BackendOps.saveArea(area);
+            }
+
+            // Save address after saving area
             CustAddress addrToSave = null;
-            // Check if edit case
+
             if(addr.getId()!=null && !addr.getId().isEmpty()) {
                 mLogger.debug("Cust Address edit case: "+addr.getId());
+
                 // Fetch corresponding custAddress record from DB
                 CustAddress addrDb = BackendOps.getAddress(addr.getId());
-                // copy all fields
-                addrDb.setArea(addr.getArea());
+                // copy all fields that can be edited
                 addrDb.setContactNum(addr.getContactNum());
                 addrDb.setText1(addr.getText1());
                 addrDb.setToName(addr.getToName());
@@ -64,15 +77,14 @@ public class CustomerServices implements IBackendlessService {
                 mLogger.debug("Cust Address add case");
                 // Add case - generate id
                 addr.setId(BackendUtils.generateCustAddrId(customer.getPrivate_id()));
-                if(addr.getArea().getId()==null || addr.getArea().getId().isEmpty()) {
-                    mLogger.debug("New Area case: "+addr.getArea().getAreaName());
-                    // New area case
-                    addr.getArea().setId(BackendUtils.generateAreaId());
-                    addr.getArea().setValidated(false);
-                }
                 addrToSave = addr;
             }
 
+            // area id to be updated whether edit or add case
+            addrToSave.setAreaId(addr.getArea().getId());
+            // this field is not stored in DB and
+            // is only used to transfer area object between app and backend
+            addrToSave.setArea(null);
             addrToSave = BackendOps.saveCustAddress(addrToSave);
 
             try {
@@ -88,7 +100,7 @@ public class CustomerServices implements IBackendlessService {
             }
 
             mEdr[BackendConstants.EDR_RESULT_IDX] = BackendConstants.BACKEND_EDR_RESULT_OK;
-            return BackendOps.fetchCustAddresses(customer.getPrivate_id());
+            return BackendOps.fetchCustAddresses(customer.getPrivate_id(), mLogger);
 
         } catch(Exception e) {
             BackendUtils.handleException(e,validException,mLogger,mEdr);

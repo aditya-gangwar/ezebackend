@@ -194,8 +194,9 @@ public class GenericUserEventHandler extends com.backendless.servercode.extensio
                     customer.setTxn_pin("");
                     customer.setNamak("");
                     // 'addresses' is not actually stored in DB
-                    // this field only acts as transport - so as customer dont have to do another query for it
-                    customer.setAddresses(BackendOps.fetchCustAddresses(customer.getPrivate_id()));
+                    // this field only acts as transport - so as customer don't have to do another query for it
+                    // Similarly, 'area' within custAddress object is also not stored in DB
+                    customer.setAddresses(BackendOps.fetchCustAddresses(customer.getPrivate_id(), mLogger));
                     result.getResult().put("customer", customer);
 
                 } else if (userType == DbConstants.USER_TYPE_AGENT ||
