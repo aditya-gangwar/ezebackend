@@ -501,7 +501,7 @@ public class TxnProcessHelper {
             mLogger.debug("Setting new Txn tables for mCustomer: "+newTables+","+currTables);
             customer.setTxn_tables(newTables);
             // update mCustomer object
-            return BackendOps.updateCustomer(customer);
+            return BackendOps.saveCustomer(customer);
         }
         return null;
     }*/

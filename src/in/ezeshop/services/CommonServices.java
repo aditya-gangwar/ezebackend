@@ -23,7 +23,6 @@ import in.ezeshop.common.database.*;
 import in.ezeshop.common.constants.*;
 
 import java.util.Date;
-import java.util.List;
 
 /**
  * Created by adgangwa on 19-07-2016.
@@ -73,7 +72,7 @@ public class CommonServices implements IBackendlessService {
                             "Provided Customer Id don't match: " + userId);
                 }
                 customer.setMsgDevId(deviceId);
-                customer = BackendOps.updateCustomer(customer);
+                customer = BackendOps.saveCustomer(customer);
                 devId = customer.getMsgDevId();
 
             } else if (userType == DbConstants.USER_TYPE_MERCHANT) {
@@ -818,7 +817,7 @@ public class CommonServices implements IBackendlessService {
         customer.setMembership_card(newCard);
 
         // save updated customer object
-        BackendOps.updateCustomer(customer);
+        BackendOps.saveCustomer(customer);
 
         // update old card status
         try {
@@ -872,7 +871,7 @@ public class CommonServices implements IBackendlessService {
         // Else new PIn will be generated on Customer Reset PIN timer expiry
         SecurityHelper.generateCustPin(customer, mLogger);
         // update user account for the PIN
-        BackendOps.updateCustomer(customer);
+        BackendOps.saveCustomer(customer);
 
         // Send SMS through HTTP
         String smsText = String.format(SmsConstants.SMS_PIN_INIT,
@@ -886,7 +885,7 @@ public class CommonServices implements IBackendlessService {
         // update user account for the PIN
         //customer.setTxn_pin(newPin);
         SecurityHelper.setCustPin(customer, newPin, mLogger);
-        BackendOps.updateCustomer(customer);
+        BackendOps.saveCustomer(customer);
 
         // Send SMS through HTTP
         String smsText = SmsHelper.buildPinChangeSMS(customer.getMobile_num());

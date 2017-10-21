@@ -7,6 +7,7 @@ import com.backendless.HeadersManager;
 import com.backendless.exceptions.BackendlessException;
 import com.backendless.servercode.InvocationContext;
 import com.backendless.servercode.RunnerContext;
+import in.ezeshop.common.Base35;
 import in.ezeshop.common.CommonUtils;
 import in.ezeshop.common.MyErrorParams;
 import in.ezeshop.common.MyGlobalSettings;
@@ -20,7 +21,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
-import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 import in.ezeshop.common.database.*;
@@ -73,14 +73,13 @@ public class BackendUtils {
 
     public static String generateCustAddrId(String custPrivId) {
         // Id : <6 chars for customer private id> + <6 char for own epoch time in 10 secs block> = total 12 chars
-        long timeSecs = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
-        long myTimeSecs = Math.round((timeSecs - CommonConstants.START_EPOCH_SECS) / 10);
+        long myTimeSecs = Math.round(CommonUtils.getMyEpochSecs() / 10);
         return custPrivId + Base35.fromBase10(myTimeSecs, 6);
     }
 
     public static String generateAreaId() {
-        // Id : millisecs as Base35
-        return Base35.fromBase10((System.currentTimeMillis()-CommonConstants.START_EPOCH_MILLI_SECS), 0);
+        Random random = new Random();
+        return Base35.fromBase10(random.nextLong(), 0);
     }
 
     /*public static String generateMchntOrderId() {
@@ -422,7 +421,7 @@ public class BackendUtils {
         merchant.setAdmin_status(status);
         merchant.setStatus_reason(reason);
         merchant.setStatus_update_time(new Date());
-        merchant = BackendOps.updateMerchant(merchant);
+        merchant = BackendOps.saveMerchant(merchant);
 
         // Generate SMS to inform the same - only when acc is locked or disabled
         String smsText = null;
@@ -446,7 +445,7 @@ public class BackendUtils {
         customer.setAdmin_status(status);
         customer.setStatus_reason(reason);
         customer.setStatus_update_time(new Date());
-        customer = BackendOps.updateCustomer(customer);
+        customer = BackendOps.saveCustomer(customer);
 
         // Generate SMS to inform the same - only when acc is locked or disabled
         String smsText = null;
@@ -697,7 +696,7 @@ public class BackendUtils {
     /*
      * Other Miscellaneous functions
      */
-    public static boolean isTrustedDevice(String deviceId, List<MerchantDevice> trustedDevices) {
+    /*public static boolean isTrustedDevice(String deviceId, List<MerchantDevice> trustedDevices) {
 
         if(BackendConstants.TESTING_SKIP_DEVICEID_CHECK) {
             return true;
@@ -713,7 +712,7 @@ public class BackendUtils {
             }
         }
         return false;
-    }
+    }*/
 
     public static String getMchntDpFilename(String mchntId) {
         return "dp_" + String.valueOf(System.currentTimeMillis()) + "_" + mchntId + "."+CommonConstants.PHOTO_FILE_FORMAT;
@@ -758,7 +757,7 @@ public class BackendUtils {
 
         try {
             // Fetch city
-            Cities city = BackendOps.fetchCity(merchant.getAddress().getCity());
+            Cities city = BackendOps.fetchCity(merchant.getAddress().getAreaNIDB().getCity().getCity());
 
             // get open merchant id batch
             String countryCode = city.getCountryCode();
@@ -880,6 +879,24 @@ public class BackendUtils {
         }
     }
 
+    public static void remSensitiveData(Merchants merchant) {
+        // Remove sensitive data that should not be visible to other users like Customer
+        merchant.setDob("");
+        merchant.setEmail("");
+        merchant.setMobile_num("");
+        merchant.setCashback_table("");
+        merchant.setTxn_table("");
+        merchant.setAgentId("");
+        merchant.setRegFormNum("");
+        merchant.setLast_txn_archive(null);
+        merchant.setDelLocalFilesReq(null);
+        merchant.setCl_credit_limit_for_pin(-1);
+        merchant.setCl_debit_limit_for_pin(-1);
+
+        // calling to this fx. means - merchant object is sent to other users like Customer
+        // As other users anyways wont be allowed to update Merchant object
+        // so removing object Id too
+    }
 
     public static void initAll() {
 

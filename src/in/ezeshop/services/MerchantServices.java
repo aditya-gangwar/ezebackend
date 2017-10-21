@@ -180,7 +180,7 @@ public class MerchantServices implements IBackendlessService {
                 // Update with new mobile number
                 try {
                     merchant.setMobile_num(newMobile);
-                    merchant = BackendOps.updateMerchant(merchant);
+                    merchant = BackendOps.saveMerchant(merchant);
                 } catch(Exception e) {
                     mLogger.error("changeMobile: Exception while updating merchant status: "+merchant.getAuto_id());
                     // Rollback - delete merchant op added
@@ -255,7 +255,7 @@ public class MerchantServices implements IBackendlessService {
             merchant.setPrepaidCbRate(ppCbRate);
             merchant.setPrepaidCbMinAmt(ppMinAmt);
             // update object in DB
-            merchant = BackendOps.updateMerchant(merchant);
+            merchant = BackendOps.saveMerchant(merchant);
 
             // no exception - means function execution success
             mEdr[BackendConstants.EDR_RESULT_IDX] = BackendConstants.BACKEND_EDR_RESULT_OK;
@@ -808,19 +808,27 @@ public class MerchantServices implements IBackendlessService {
                     throw e;
                 }
 
-                // create directory for 'txnCsv' files
                 String fileDir = null;
                 String filePath = null;
                 try {
+                    // create directory for 'txnCsv' files
                     fileDir = CommonUtils.getCustomerTxnDir(customer.getPrivate_id());
                     filePath = fileDir + CommonConstants.FILE_PATH_SEPERATOR+BackendConstants.DUMMY_FILENAME;
                     // saving dummy files to create parent directories
                     Backendless.Files.saveFile(filePath, BackendConstants.DUMMY_DATA.getBytes("UTF-8"), true);
                     // Give this customer permissions for this directory
                     FilePermission.READ.grantForUser( customerUser.getObjectId(), fileDir);
-                    //FilePermission.DELETE.grantForUser( user.getObjectId(), fileDir);
-                    //FilePermission.WRITE.grantForUser( user.getObjectId(), fileDir);
                     mLogger.debug("Saved dummy txn csv file: " + filePath);
+
+                    // create directory for 'prescriptions'
+                    fileDir = CommonUtils.getCustPrescripDir(customer.getPrivate_id());
+                    filePath = fileDir + CommonConstants.FILE_PATH_SEPERATOR+BackendConstants.DUMMY_FILENAME;
+                    // saving dummy file to create parent directories
+                    Backendless.Files.saveFile(filePath, BackendConstants.DUMMY_DATA.getBytes("UTF-8"), true);
+                    // Give this customer permissions for this directory
+                    FilePermission.READ.grantForUser( customerUser.getObjectId(), fileDir);
+                    FilePermission.WRITE.grantForUser( customerUser.getObjectId(), fileDir);
+                    mLogger.debug("Saved dummy prescription file: " + filePath);
 
                 } catch(Exception e) {
                     mLogger.fatal("Failed to create customer directory: "+customerMobile+","+e.toString());
@@ -961,7 +969,7 @@ public class MerchantServices implements IBackendlessService {
                     mEdr, mLogger);
             /*customer.setAdmin_status(DbConstants.USER_STATUS_REG_ERROR);
             customer.setStatus_reason(DbConstantsBackend.REG_ERROR_REG_FAILED);
-            BackendOps.updateCustomer(customer);*/
+            BackendOps.saveCustomer(customer);*/
 
             // free up the card for next allocation
             /*if(card!=null) {

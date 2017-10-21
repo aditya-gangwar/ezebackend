@@ -156,8 +156,63 @@ public class BackendOps {
             String errorMsg = "No Merchant found: "+userId+", "+query.getWhereClause();
             throw new BackendlessException(String.valueOf(ErrorCodes.NO_SUCH_USER), errorMsg);
         } else {
-            return user.getData().get(0);
+            Merchants mchnt = user.getData().get(0);
+            if(addressChild) {
+                // fetch and set area
+                mchnt.getAddress().setAreaNIDB(getArea(mchnt.getAddress().getAreaId()));
+            }
+            return mchnt;
         }
+    }
+
+    public static List<Merchants> fetchMerchants(List<String> autoIds, boolean addressChild, MyLogger logger) {
+        BackendlessDataQuery query = new BackendlessDataQuery();
+
+        // build where clause
+        StringBuffer whereClause = null;
+        for (String id : autoIds) {
+            if(id!=null) {
+                if (whereClause == null) {
+                    whereClause = new StringBuffer("auto_id = '"+id+"'");
+                } else {
+                    whereClause.append(" OR auto_id = '").append(id).append("'");
+                }
+            }
+        }
+        query.setWhereClause(whereClause.toString());
+
+        if(addressChild) {
+            QueryOptions queryOptions = new QueryOptions();
+            queryOptions.addRelated("address");
+            query.setQueryOptions(queryOptions);
+        }
+
+        BackendlessCollection<Merchants> users = Backendless.Data.of( Merchants.class ).find(query);
+        if( users.getTotalObjects() == 0) {
+            String errorMsg = "No Merchant found: "+query.getWhereClause();
+            throw new BackendlessException(String.valueOf(ErrorCodes.NO_SUCH_USER), errorMsg);
+        }
+
+        ArrayList<Merchants> objects = new ArrayList<>();
+        while (users.getCurrentPage().size() > 0)
+        {
+            objects.addAll(users.getData());
+            users = users.nextPage();
+        }
+
+        // fetch area objects, and attach to 'address' object in merchant
+        if(addressChild) {
+            List<String> areaIds = new ArrayList<>(objects.size());
+            for (Merchants m : objects) {
+                areaIds.add(m.getAddress().getAreaId());
+            }
+            HashMap<String, Areas> areas = fetchAreas(areaIds, logger);
+            for (Merchants mchnt : objects) {
+                mchnt.getAddress().setAreaNIDB(areas.get(mchnt.getAddress().getAreaId()));
+            }
+        }
+
+        return objects;
     }
 
     public static Merchants getMerchant(String whereClause) {
@@ -173,33 +228,6 @@ public class BackendOps {
         }
     }
 
-    public static ArrayList<Merchants> fetchMerchants(String whereClause) {
-        BackendlessDataQuery query = new BackendlessDataQuery();
-        query.setPageSize(CommonConstants.DB_QUERY_PAGE_SIZE);
-        query.setWhereClause(whereClause);
-
-        BackendlessCollection<Merchants> users = Backendless.Data.of( Merchants.class ).find(query);
-        int cnt = users.getTotalObjects();
-        if( cnt == 0) {
-            // No matching merchant is not an error
-            return null;
-        } else {
-            ArrayList<Merchants> objects = new ArrayList<>();
-            while (users.getCurrentPage().size() > 0)
-            {
-                objects.addAll(users.getData());
-                //int size  = users.getCurrentPage().size();
-                /*Iterator<Merchants> iterator = users.getCurrentPage().iterator();
-                while( iterator.hasNext() )
-                {
-                    objects.add(iterator.next());
-                }*/
-                users = users.nextPage();
-            }
-            return objects;
-        }
-    }
-
     public static int getMerchantCnt(String whereClause) {
         BackendlessDataQuery query = new BackendlessDataQuery();
         query.setWhereClause(whereClause);
@@ -208,7 +236,12 @@ public class BackendOps {
         return users.getTotalObjects();
     }
 
-    public static Merchants updateMerchant(Merchants merchant) {
+    public static Merchants saveMerchant(Merchants merchant) {
+        // this field is not stored in DB and
+        // is only used to transfer area object between app and backend
+        if(merchant.getAddress()!=null) {
+            merchant.getAddress().setAreaNIDB(null);
+        }
         return Backendless.Persistence.save(merchant);
     }
 
@@ -258,8 +291,11 @@ public class BackendOps {
         }
     }
 
-    public static Customers updateCustomer(Customers customer) {
+    public static Customers saveCustomer(Customers customer) {
         Backendless.Data.mapTableToClass("Customers", Customers.class);
+        // this field is not stored in DB and
+        // is only used to transfer area object between app and backend
+        customer.setAddressesNIDB(null);
         return Backendless.Persistence.save(customer);
     }
 
@@ -1147,15 +1183,13 @@ public class BackendOps {
         }
 
         // fetch area objects, and attach to 'custAddress' objects
-        String[] areaIds = new String[CommonConstants.MAX_ADDRESS_PER_CUSTOMER];
-        int i = 0;
+        List<String> areaIds = new ArrayList<>(CommonConstants.MAX_ADDRESS_PER_CUSTOMER);
         for (CustAddress addr: objects) {
-            areaIds[i] = addr.getAreaId();
-            i++;
+            areaIds.add(addr.getAreaId());
         }
         HashMap<String, Areas> areas = fetchAreas(areaIds, logger);
         for (CustAddress addr: objects) {
-            addr.setArea(areas.get(addr.getAreaId()));
+            addr.setAreaNIDB(areas.get(addr.getAreaId()));
         }
 
         return objects;
@@ -1182,24 +1216,45 @@ public class BackendOps {
 
     public static CustAddress saveCustAddress(CustAddress addr) {
         Backendless.Data.mapTableToClass("CustAddress", CustAddress.class);
+        // this field is not stored in DB and
+        // is only used to transfer area object between app and backend
+        addr.setAreaNIDB(null);
         return Backendless.Persistence.save(addr);
     }
 
     /*
      * Area functions
      */
-    public static HashMap<String, Areas> fetchAreas(String[] idList, MyLogger logger) {
+    public static Areas getArea(String id) {
+        Backendless.Data.mapTableToClass("Areas", Areas.class);
+
+        BackendlessDataQuery query = new BackendlessDataQuery();
+        query.setWhereClause("id = '" + id + "'");
+
+        QueryOptions queryOptions = new QueryOptions();
+        queryOptions.addRelated("city");
+        query.setQueryOptions(queryOptions);
+
+        BackendlessCollection<Areas> collection = Backendless.Data.of( Areas.class ).find(query);
+        int cnt = collection.getTotalObjects();
+        if( cnt == 0) {
+            String errorMsg = "No Areas found: "+query.getWhereClause();
+            throw new BackendlessException(String.valueOf(ErrorCodes.NO_DATA_FOUND), errorMsg);
+        } else {
+            return collection.getData().get(0);
+        }
+    }
+
+    public static HashMap<String, Areas> fetchAreas(List<String> idList, MyLogger logger) {
         Backendless.Data.mapTableToClass("Areas", Areas.class);
 
         // build where clause
         String whereClause = null;
         for (String id : idList) {
-            if(id!=null) {
-                if (whereClause == null) {
-                    whereClause = "id = '" + id + "'";
-                } else {
-                    whereClause = whereClause + " OR id = '" + id + "'";
-                }
+            if (whereClause == null) {
+                whereClause = "id = '" + id + "'";
+            } else {
+                whereClause = whereClause + " OR id = '" + id + "'";
             }
         }
 
@@ -1238,6 +1293,33 @@ public class BackendOps {
         return Backendless.Persistence.save(area);
     }
 
+
+    public static List<String> fetchMchntsForDlvry(String areaId) {
+        Backendless.Data.mapTableToClass("MchntDlvryAreas", MchntDlvryAreas.class);
+
+        BackendlessDataQuery query = new BackendlessDataQuery();
+        query.setWhereClause("areaId = '"+areaId+"'");
+        query.setPageSize( CommonConstants.DB_QUERY_PAGE_SIZE);
+
+        BackendlessCollection<MchntDlvryAreas> collection = Backendless.Data.of( MchntDlvryAreas.class ).find(query);
+        int cnt = collection.getTotalObjects();
+        if( cnt == 0) {
+            String errorMsg = "No Merchants found: "+query.getWhereClause();
+            throw new BackendlessException(String.valueOf(ErrorCodes.NO_DATA_FOUND), errorMsg);
+        }
+
+        ArrayList<String> objects = new ArrayList<>();
+        while (collection.getCurrentPage().size() > 0)
+        {
+            Iterator<MchntDlvryAreas> iterator = collection.getCurrentPage().iterator();
+            while (iterator.hasNext()) {
+                MchntDlvryAreas item = iterator.next();
+                objects.add(item.getMerchantId());
+            }
+            collection = collection.nextPage();
+        }
+        return objects;
+    }
 
 
     /*

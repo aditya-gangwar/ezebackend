@@ -109,7 +109,7 @@ public class CustomerPasswdPinResetTimer extends com.backendless.servercode.exte
             String newPin = SecurityHelper.generateCustPin(customer, mLogger);
 
             // update user account for the PIN
-            BackendOps.updateCustomer(customer);
+            BackendOps.saveCustomer(customer);
 
             // print roles - for debug purpose
             List<String> roles = Backendless.UserService.getUserRoles();

@@ -146,7 +146,7 @@ public class GenericUserEventHandler extends com.backendless.servercode.extensio
                             merchant.setTempDevId(null);
 
                             try {
-                                merchant = BackendOps.updateMerchant(merchant);
+                                merchant = BackendOps.saveMerchant(merchant);
                             } catch (BackendlessException e) {
                                 if (e.getCode().equals(ErrorCodes.BL_ERROR_DUPLICATE_ENTRY)) {
                                     // there's unique index on device id
@@ -170,7 +170,7 @@ public class GenericUserEventHandler extends com.backendless.servercode.extensio
                     if (!merchant.getFirst_login_ok()) {
                         merchant.setFirst_login_ok(true);
                         //merchant.setAdmin_remarks("Last state was new registered");
-                        merchant = BackendOps.updateMerchant(merchant);
+                        merchant = BackendOps.saveMerchant(merchant);
                     }
 
                     result.getResult().put("merchant", merchant);
@@ -186,7 +186,7 @@ public class GenericUserEventHandler extends com.backendless.servercode.extensio
 
                     if (!customer.getFirst_login_ok()) {
                         customer.setFirst_login_ok(true);
-                        customer = BackendOps.updateCustomer(customer);
+                        customer = BackendOps.saveCustomer(customer);
                     }
 
                     // all fine - add customer object to result
@@ -196,7 +196,7 @@ public class GenericUserEventHandler extends com.backendless.servercode.extensio
                     // 'addresses' is not actually stored in DB
                     // this field only acts as transport - so as customer don't have to do another query for it
                     // Similarly, 'area' within custAddress object is also not stored in DB
-                    customer.setAddresses(BackendOps.fetchCustAddresses(customer.getPrivate_id(), mLogger));
+                    customer.setAddressesNIDB(BackendOps.fetchCustAddresses(customer.getPrivate_id(), mLogger));
                     result.getResult().put("customer", customer);
 
                 } else if (userType == DbConstants.USER_TYPE_AGENT ||

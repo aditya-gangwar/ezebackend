@@ -119,7 +119,7 @@ public class InternalUserServices implements IBackendlessService {
                 /*merchant.setAdmin_status(DbConstants.USER_STATUS_DISABLED);
                 merchant.setStatus_update_time(new Date());
                 merchant.setStatus_reason(reason);
-                merchant = BackendOps.updateMerchant(merchant);*/
+                merchant = BackendOps.saveMerchant(merchant);*/
             } catch(Exception e) {
                 mLogger.error("disableMerchant: Exception while updating merchant status: "+merchantId);
                 // Rollback - delete merchant op added

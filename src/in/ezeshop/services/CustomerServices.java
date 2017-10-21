@@ -7,6 +7,7 @@ import in.ezeshop.common.MyMerchant;
 import in.ezeshop.common.database.CustomerOps;
 import in.ezeshop.constants.BackendConstants;
 import in.ezeshop.constants.DbConstantsBackend;
+import in.ezeshop.database.InternalUser;
 import in.ezeshop.utilities.BackendOps;
 import in.ezeshop.utilities.BackendUtils;
 import in.ezeshop.utilities.MyLogger;
@@ -30,6 +31,53 @@ public class CustomerServices implements IBackendlessService {
      * Public methods: Backend REST APIs
      * Customer operations
      */
+    public List<Merchants> mchntsByDeliveryArea(String areadId) {
+        long startTime = System.currentTimeMillis();
+        mEdr[BackendConstants.EDR_START_TIME_IDX] = String.valueOf(startTime);
+        mEdr[BackendConstants.EDR_API_NAME_IDX] = "mchntsByDeliveryArea";
+
+        boolean validException = false;
+        try {
+            mLogger.debug("In mchntsByDeliveryArea: "+areadId);
+
+            // Fetch customer - send userType param as null to avoid checking within fetchCurrentUser fx.
+            // But check immediately after
+            Object userObj = BackendUtils.fetchCurrentUser(null, mEdr, mLogger, false);
+            int userType = Integer.parseInt(mEdr[BackendConstants.EDR_USER_TYPE_IDX]);
+
+            //boolean callByCC = false;
+            if(userType==DbConstants.USER_TYPE_CUSTOMER) {
+                Customers customer = (Customers) userObj;
+                mEdr[BackendConstants.EDR_CUST_ID_IDX] = customer.getPrivate_id();
+
+            } else if(userType==DbConstants.USER_TYPE_CC) {
+                InternalUser user = (InternalUser) userObj;
+                mEdr[BackendConstants.EDR_INTERNAL_USER_ID_IDX] = user.getId();
+
+            } else {
+                mEdr[BackendConstants.EDR_SPECIAL_FLAG_IDX] = BackendConstants.BACKEND_EDR_SECURITY_BREACH;
+                throw new BackendlessException(String.valueOf(ErrorCodes.OPERATION_NOT_ALLOWED), "Operation not allowed to this user");
+            }
+
+            // Fetch merchant ids delivering in given area
+            List<String> mchntIds= BackendOps.fetchMchntsForDlvry(areadId);
+            List<Merchants> mchnts = BackendOps.fetchMerchants(mchntIds, true, mLogger);
+            // remove sensitive data from all objects
+            for (Merchants mchnt : mchnts) {
+                BackendUtils.remSensitiveData(mchnt);
+            }
+
+            mEdr[BackendConstants.EDR_RESULT_IDX] = BackendConstants.BACKEND_EDR_RESULT_OK;
+            return mchnts;
+
+        } catch(Exception e) {
+            BackendUtils.handleException(e,validException,mLogger,mEdr);
+            throw e;
+        } finally {
+            BackendUtils.finalHandling(startTime,mLogger,mEdr);
+        }
+    }
+
     public List<CustAddress> saveCustAddress(CustAddress addr, Boolean setAsDefault) {
         long startTime = System.currentTimeMillis();
         mEdr[BackendConstants.EDR_START_TIME_IDX] = String.valueOf(startTime);
@@ -37,7 +85,8 @@ public class CustomerServices implements IBackendlessService {
 
         boolean validException = false;
         try {
-            mLogger.debug("In saveCustAddress: "+addr.getArea().getValidated()+", "+setAsDefault);
+            Areas rcvdArea = addr.getAreaNIDB();
+            mLogger.debug("In saveCustAddress: "+rcvdArea.getValidated()+", "+setAsDefault);
 
             // Only customer allowed to update address - internal user also not allowed
             Customers customer = (Customers) BackendUtils.fetchCurrentUser(DbConstants.USER_TYPE_CUSTOMER, mEdr, mLogger, false);
@@ -48,16 +97,13 @@ public class CustomerServices implements IBackendlessService {
                 throw new BackendlessException(String.valueOf(ErrorCodes.OPERATION_NOT_ALLOWED), "Operation not allowed to this user");
             }
 
-            mLogger.debug("Mark1: "+addr.getArea().getValidated()+", "+addr.getArea().getAreaName()+", "+addr.getArea().getCity().getCity());
-
             // First check if area is to be saved
-            if(addr.getArea().getId()==null || addr.getArea().getId().isEmpty()) {
-                mLogger.debug("New Area case: "+addr.getArea().getAreaName());
+            if(rcvdArea.getId()==null || rcvdArea.getId().isEmpty()) {
+                mLogger.debug("New Area case: "+rcvdArea.getAreaName());
                 // New area - add to DB first
-                Areas area = addr.getArea();
-                area.setId(BackendUtils.generateAreaId());
-                area.setValidated(false);
-                BackendOps.saveArea(area);
+                rcvdArea.setId(BackendUtils.generateAreaId());
+                rcvdArea.setValidated(false);
+                rcvdArea = BackendOps.saveArea(rcvdArea);
             }
 
             // Save address after saving area
@@ -81,16 +127,13 @@ public class CustomerServices implements IBackendlessService {
             }
 
             // area id to be updated whether edit or add case
-            addrToSave.setAreaId(addr.getArea().getId());
-            // this field is not stored in DB and
-            // is only used to transfer area object between app and backend
-            addrToSave.setArea(null);
+            addrToSave.setAreaId(rcvdArea.getId());
             addrToSave = BackendOps.saveCustAddress(addrToSave);
 
             try {
                 if(setAsDefault) {
                     customer.setDefaultAddressId(addrToSave.getId());
-                    BackendOps.updateCustomer(customer);
+                    BackendOps.saveCustomer(customer);
                 }
             } catch (Exception e) {
                 // ignore

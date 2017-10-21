@@ -134,7 +134,7 @@ public class TxnArchiver
                     mLastFetchMerchant.setLast_txn_archive(mToday);
                     // ignore any failure to update
                     try {
-                        BackendOps.updateMerchant(mLastFetchMerchant);
+                        BackendOps.saveMerchant(mLastFetchMerchant);
                     } catch(Exception e) {
                         mLogger.error("archiveMerchantTxns: Failed to update archive time in merchant record: "+merchantId);
                     }

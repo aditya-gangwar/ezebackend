@@ -21,7 +21,6 @@ import in.ezeshop.common.database.*;
 import in.ezeshop.common.constants.*;
 import in.ezeshop.utilities.SecurityHelper;
 
-import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -187,7 +186,7 @@ public class AdminServices implements IBackendlessService {
                 if(merchant.getAdmin_status().equals(newStatus)) {
                     // old and new status is same
                     // update merchant object
-                    merchant = BackendOps.updateMerchant(merchant);
+                    merchant = BackendOps.saveMerchant(merchant);
                 } else {
                     // old and new status are different
                     // change status - this will save the updated merchant object too
@@ -377,7 +376,7 @@ public class AdminServices implements IBackendlessService {
                 if(!dntUpdate) {
                     if (customer.getAdmin_status().equals(newStatus)) {
                         // old and new status is same - update customer object only
-                        customer = BackendOps.updateCustomer(customer);
+                        customer = BackendOps.saveCustomer(customer);
                     } else {
                         // old and new status are different
                         // change status - this will save the updated merchant object too
@@ -987,9 +986,9 @@ public class AdminServices implements IBackendlessService {
         merchant.setEmail("");
         merchant.setBuss_category("Other");
         Address address = new Address();
-        address.setCity(CommonConstants.DUMMY_CITY_NAME);
-        address.setState("DummyState");
         address.setLine_1("1234, Dummy Address");
+        // ToDo: This to be corrected - to be set to Dummy area id
+        address.setAreaId("1234");
         merchant.setAddress(address);
         merchant.setDob(dob);
         merchant.setContactPhone(mobile);

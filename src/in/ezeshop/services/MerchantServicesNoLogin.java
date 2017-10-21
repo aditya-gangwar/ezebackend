@@ -68,7 +68,7 @@ public class MerchantServicesNoLogin implements IBackendlessService {
 
             // Update device Info in merchant object
             merchant.setTempDevId(deviceInfo);
-            BackendOps.updateMerchant(merchant);
+            BackendOps.saveMerchant(merchant);
 
             // no exception - means function execution success
             mEdr[BackendConstants.EDR_RESULT_IDX] = BackendConstants.BACKEND_EDR_RESULT_OK;
