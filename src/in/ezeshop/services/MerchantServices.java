@@ -62,7 +62,7 @@ public class MerchantServices implements IBackendlessService {
             Merchants merchant = (Merchants) BackendUtils.fetchCurrentUser(DbConstants.USER_TYPE_MERCHANT, mEdr, mLogger, false);
 
             String custMobile = null;
-            int idType = BackendUtils.getCustomerIdType(custMobileOrId);
+            int idType = IdGenerator.getCustomerIdType(custMobileOrId);
             if(idType!=CommonConstants.ID_TYPE_MOBILE) {
                 // fetch customer with given id
                 Customers customer = BackendOps.getCustomer(custMobileOrId, idType, false);
@@ -358,7 +358,7 @@ public class MerchantServices implements IBackendlessService {
             }
             mLogger.setProperties(InvocationContext.getUserId(), userType, debugLogs);
 
-            int customerIdType = CommonUtils.getCustomerIdType(customerId);
+            int customerIdType = IdGenerator.getCustomerIdType(customerId);
             //mLogger.debug("In getCashback: " + merchantId + ": " + customerId);
             //mLogger.debug("Before context: "+InvocationContext.asString());
             //mLogger.debug("Before: "+ HeadersManager.getInstance().getHeaders().toString());
@@ -758,7 +758,7 @@ public class MerchantServices implements IBackendlessService {
                 }
 
                 // Create customer object
-                customer = createCustomer();
+                customer = createCustomer(merchant.getAuto_id());
                 // generate PIN
                 String pin = SecurityHelper.generateCustPin(customer, mLogger);
                 // set fields
@@ -871,7 +871,7 @@ public class MerchantServices implements IBackendlessService {
     /*
      * Private helper methods
      */
-    private Customers createCustomer() {
+    private Customers createCustomer(String mchntId) {
         Customers customer = new Customers();
         customer.setAdmin_status(DbConstants.USER_STATUS_ACTIVE);
         customer.setStatus_reason(DbConstantsBackend.ENABLED_ACTIVE);
@@ -880,10 +880,10 @@ public class MerchantServices implements IBackendlessService {
         //customer.setLastRenewDate(new Date());
 
         // get customer counter value and encode the same to get customer private id
-        Long customerCnt =  BackendOps.fetchCounterValue(DbConstantsBackend.CUSTOMER_ID_COUNTER);
-        String private_id = Base35.fromBase10(customerCnt, CommonConstants.CUSTOMER_INTERNAL_ID_LEN);
-        mLogger.debug("Generated private id: "+private_id);
-        customer.setPrivate_id(private_id);
+        //Long customerCnt =  BackendOps.fetchCounterValue(DbConstantsBackend.CUSTOMER_ID_COUNTER);
+        //String private_id = Base35.fromBase10(customerCnt, CommonConstants.CUSTOMER_INTERNAL_ID_LEN);
+        customer.setPrivate_id(IdGenerator.genCustPrivateId(mchntId));
+        //mLogger.debug("Generated private id: "+private_id);
 
         //String pin = BackendUtils.generateCustomerPIN();
         //mLogger.debug("Generated PIN: "+pin);

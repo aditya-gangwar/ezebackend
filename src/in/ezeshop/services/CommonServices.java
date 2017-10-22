@@ -11,14 +11,11 @@ import in.ezeshop.common.MyGlobalSettings;
 import in.ezeshop.constants.DbConstantsBackend;
 import in.ezeshop.database.AllOtp;
 import in.ezeshop.messaging.SmsHelper;
-import in.ezeshop.utilities.BackendOps;
-import in.ezeshop.utilities.SecurityHelper;
+import in.ezeshop.utilities.*;
 import in.ezeshop.constants.BackendConstants;
 import in.ezeshop.common.database.CustomerOps;
 import in.ezeshop.database.InternalUser;
 import in.ezeshop.messaging.SmsConstants;
-import in.ezeshop.utilities.BackendUtils;
-import in.ezeshop.utilities.MyLogger;
 import in.ezeshop.common.database.*;
 import in.ezeshop.common.constants.*;
 
@@ -131,7 +128,7 @@ public class CommonServices implements IBackendlessService {
             mEdr[BackendConstants.EDR_USER_ID_IDX] = userId;
             if(userType==-1) {
                 // exception in login scenario
-                userType = BackendUtils.getUserType(userId);
+                userType = IdGenerator.getUserType(userId);
             }
             mEdr[BackendConstants.EDR_USER_TYPE_IDX] = String.valueOf(userType);
 
@@ -317,7 +314,7 @@ public class CommonServices implements IBackendlessService {
                 }*/
             } else if (userType == DbConstants.USER_TYPE_CC) {
                 try {
-                    customer = BackendOps.getCustomer(custId, CommonUtils.getCustomerIdType(custId), true);
+                    customer = BackendOps.getCustomer(custId, IdGenerator.getCustomerIdType(custId), true);
                     //card = customer.getMembership_card();
                 } catch(BackendlessException e) {
                     if(e.getCode().equals(String.valueOf(ErrorCodes.NO_SUCH_USER))) {

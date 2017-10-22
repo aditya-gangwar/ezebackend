@@ -8,6 +8,7 @@ import com.backendless.exceptions.BackendlessFault;
 import com.backendless.logging.Logger;
 import com.backendless.persistence.BackendlessDataQuery;
 import com.backendless.persistence.QueryOptions;
+import in.ezeshop.common.CommonUtils;
 import in.ezeshop.common.MyGlobalSettings;
 import in.ezeshop.common.database.*;
 import in.ezeshop.common.constants.*;
@@ -24,8 +25,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.*;
-
-import static in.ezeshop.utilities.BackendUtils.getMerchantIdType;
 
 /**
  * Created by adgangwa on 15-05-2016.
@@ -129,7 +128,7 @@ public class BackendOps {
     public static Merchants getMerchant(String userId, boolean trustedDevicesChild, boolean addressChild) {
         BackendlessDataQuery query = new BackendlessDataQuery();
 
-        if(getMerchantIdType(userId)== CommonConstants.ID_TYPE_AUTO) {
+        if(IdGenerator.getMerchantIdType(userId)== CommonConstants.ID_TYPE_AUTO) {
             query.setWhereClause("auto_id = '"+userId+"'");
         } else {
             query.setWhereClause("mobile_num = '"+userId+"'");
@@ -1196,6 +1195,10 @@ public class BackendOps {
     }
 
     public static CustAddress getAddress(String id) {
+        if(id==null || id.isEmpty()) {
+            return null;
+        }
+
         Backendless.Data.mapTableToClass("CustAddress", CustAddress.class);
         BackendlessDataQuery query = new BackendlessDataQuery();
         query.setWhereClause("id = '"+id+"'");
@@ -1294,6 +1297,9 @@ public class BackendOps {
     }
 
 
+    /*
+     * Merchant Delivery Area functions
+     */
     public static List<String> fetchMchntsForDlvry(String areaId) {
         Backendless.Data.mapTableToClass("MchntDlvryAreas", MchntDlvryAreas.class);
 
@@ -1321,6 +1327,22 @@ public class BackendOps {
         return objects;
     }
 
+
+    /*
+     * Prescription functions
+     */
+    public static Prescriptions savePrescription(Prescriptions prescrip) {
+        Backendless.Data.mapTableToClass("Prescriptions", Prescriptions.class);
+        return Backendless.Persistence.save(prescrip);
+    }
+
+    /*
+     * Customer Order functions
+     */
+    public static CustomerOrder saveCustOrder(CustomerOrder order) {
+        Backendless.Data.mapTableToClass("CustomerOrder", CustomerOrder.class);
+        return Backendless.Persistence.save(order);
+    }
 
     /*
      * Bulk Operations via REST

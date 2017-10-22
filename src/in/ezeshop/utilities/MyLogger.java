@@ -25,7 +25,7 @@ public class MyLogger {
 
         mLogger = Backendless.Logging.getLogger(loggerName);
         mEdrLogger = Backendless.Logging.getLogger("utilities.edr");
-        mLogId = BackendUtils.generateLogId();
+        mLogId = IdGenerator.generateLogId();
         mDebugLogs = BackendConstants.FORCED_DEBUG_LOGS;
 
         if(BackendConstants.DEBUG_MODE) {

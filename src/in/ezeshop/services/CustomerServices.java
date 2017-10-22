@@ -1,7 +1,9 @@
 
 package in.ezeshop.services;
 
+import com.backendless.BackendlessCollection;
 import com.backendless.exceptions.BackendlessException;
+import com.backendless.files.FileInfo;
 import com.backendless.servercode.IBackendlessService;
 import in.ezeshop.common.MyMerchant;
 import in.ezeshop.common.database.CustomerOps;
@@ -10,10 +12,13 @@ import in.ezeshop.constants.DbConstantsBackend;
 import in.ezeshop.database.InternalUser;
 import in.ezeshop.utilities.BackendOps;
 import in.ezeshop.utilities.BackendUtils;
+import in.ezeshop.utilities.IdGenerator;
 import in.ezeshop.utilities.MyLogger;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.logging.LogManager;
 
 import in.ezeshop.common.database.*;
 import in.ezeshop.common.constants.*;
@@ -31,6 +36,85 @@ public class CustomerServices implements IBackendlessService {
      * Public methods: Backend REST APIs
      * Customer operations
      */
+    public CustomerOrder createCustomerOrder(String mchntId, String addressId, String comments, java.util.List<String> prescripUrls) {
+        long startTime = System.currentTimeMillis();
+        mEdr[BackendConstants.EDR_START_TIME_IDX] = String.valueOf(startTime);
+        mEdr[BackendConstants.EDR_API_NAME_IDX] = "createCustomerOrder";
+
+        boolean validException = false;
+        try {
+            mLogger.debug("In createCustomerOrder: "+mchntId);
+
+            // Only customer allowed to create order - internal user also not allowed
+            Customers customer = (Customers) BackendUtils.fetchCurrentUser(DbConstants.USER_TYPE_CUSTOMER, mEdr, mLogger, false);
+            String custId = customer.getPrivate_id();
+            mEdr[BackendConstants.EDR_CUST_ID_IDX] = custId;
+
+            // Validations - Ideally none should fail, as already checked in app
+            // 1) Valid Address should exist
+            // 2) Valid Merchant should exist
+            // 3) Either 'prescription' or 'comments' should be provided
+            CustAddress addr = BackendOps.getAddress(addressId);
+            if(addr==null) {
+                mEdr[BackendConstants.EDR_SPECIAL_FLAG_IDX] = BackendConstants.BACKEND_EDR_SECURITY_BREACH;
+                throw new BackendlessException(String.valueOf(ErrorCodes.WRONG_INPUT_DATA),"Invalid Delivery Address: " + addressId);
+            }
+            Merchants mchnt = BackendOps.getMerchant(mchntId,false,false);
+            if(mchnt==null) {
+                mEdr[BackendConstants.EDR_SPECIAL_FLAG_IDX] = BackendConstants.BACKEND_EDR_SECURITY_BREACH;
+                throw new BackendlessException(String.valueOf(ErrorCodes.WRONG_INPUT_DATA),"Invalid Merchant: " + mchntId);
+            }
+            if( prescripUrls.size()<1 && (comments==null || comments.isEmpty()) ) {
+                mEdr[BackendConstants.EDR_SPECIAL_FLAG_IDX] = BackendConstants.BACKEND_EDR_SECURITY_BREACH;
+                throw new BackendlessException(String.valueOf(ErrorCodes.WRONG_INPUT_DATA),"Neither prescription nor comments provided");
+            }
+
+            // Create prescription objects
+            List<Prescriptions> prescrips = null;
+            boolean firstPrescrip = true;
+            if(prescripUrls.size()>0) {
+                prescrips = new ArrayList<>(prescripUrls.size());
+                for (String pUrl :
+                        prescripUrls) {
+                    Prescriptions p = new Prescriptions();
+                    p.setCustomerId(custId);
+                    p.setUrl(pUrl);
+                    p.setId(IdGenerator.generatePrescripId(custId, firstPrescrip));
+                    p = BackendOps.savePrescription(p);
+                    prescrips.add(p);
+                    firstPrescrip = false;
+                }
+            } else {
+                mLogger.debug("No prescriptions in this order");
+            }
+
+            // Create order object and save
+            CustomerOrder order = new CustomerOrder();
+            order.setCustPrivId(custId);
+            order.setMerchantId(mchntId);
+            order.setAddressId(addressId);
+            order.setCreateTime(new Date());
+            order.setCustComments(comments);
+            order.setPrescrips(prescrips);
+            order.setId(IdGenerator.genCustOrderId(mchntId));
+            order = BackendOps.saveCustOrder(order);
+
+            // Set NIDB fields - after saving in DB
+            BackendUtils.remSensitiveData(mchnt);
+            order.setMerchantNIDB(mchnt);
+            order.setAddressNIDB(addr);
+
+            mEdr[BackendConstants.EDR_RESULT_IDX] = BackendConstants.BACKEND_EDR_RESULT_OK;
+            return order;
+
+        } catch(Exception e) {
+            BackendUtils.handleException(e,validException,mLogger,mEdr);
+            throw e;
+        } finally {
+            BackendUtils.finalHandling(startTime,mLogger,mEdr);
+        }
+    }
+
     public List<Merchants> mchntsByDeliveryArea(String areadId) {
         long startTime = System.currentTimeMillis();
         mEdr[BackendConstants.EDR_START_TIME_IDX] = String.valueOf(startTime);
@@ -101,7 +185,7 @@ public class CustomerServices implements IBackendlessService {
             if(rcvdArea.getId()==null || rcvdArea.getId().isEmpty()) {
                 mLogger.debug("New Area case: "+rcvdArea.getAreaName());
                 // New area - add to DB first
-                rcvdArea.setId(BackendUtils.generateAreaId());
+                rcvdArea.setId(IdGenerator.generateAreaId());
                 rcvdArea.setValidated(false);
                 rcvdArea = BackendOps.saveArea(rcvdArea);
             }
@@ -122,7 +206,7 @@ public class CustomerServices implements IBackendlessService {
             } else {
                 mLogger.debug("Cust Address add case");
                 // Add case - generate id
-                addr.setId(BackendUtils.generateCustAddrId(customer.getPrivate_id()));
+                addr.setId(IdGenerator.generateCustAddrId(customer.getPrivate_id()));
                 addrToSave = addr;
             }
 

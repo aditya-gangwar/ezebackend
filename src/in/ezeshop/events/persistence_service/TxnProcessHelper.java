@@ -8,11 +8,8 @@ import in.ezeshop.constants.BackendConstants;
 import in.ezeshop.constants.DbConstantsBackend;
 import in.ezeshop.messaging.PushNotifier;
 import in.ezeshop.messaging.SmsHelper;
-import in.ezeshop.utilities.BackendOps;
-import in.ezeshop.utilities.SecurityHelper;
+import in.ezeshop.utilities.*;
 import in.ezeshop.messaging.SmsConstants;
-import in.ezeshop.utilities.BackendUtils;
-import in.ezeshop.utilities.MyLogger;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -155,7 +152,7 @@ public class TxnProcessHelper {
                 mTransaction.setCust_private_id(mCustomer.getPrivate_id());
                 mTransaction.setMerchant_id(mMerchantId);
                 mTransaction.setMerchant_name(mMerchant.getName());
-                mTransaction.setTrans_id(BackendUtils.generateTxnId(mMerchantId));
+                mTransaction.setTrans_id(IdGenerator.generateTxnId(mMerchantId));
                 mEdr[BackendConstants.EDR_API_PARAMS_IDX]=mEdr[BackendConstants.EDR_API_PARAMS_IDX]+
                         BackendConstants.BACKEND_EDR_SUB_DELIMETER+mTransaction.getTrans_id();
                 mTransaction.setCreate_time(new Date());
@@ -517,7 +514,7 @@ public class TxnProcessHelper {
         Cashback cashback = mTransaction.getCashback();
         merchantName = mTransaction.getMerchant_name().toUpperCase(Locale.ENGLISH);
         cl_balance = CommonUtils.getAccBalance(cashback);
-        SimpleDateFormat sdf = new SimpleDateFormat(CommonConstants.DATE_FORMAT_ONLY_DATE_BACKEND, CommonConstants.DATE_LOCALE);
+        SimpleDateFormat sdf = new SimpleDateFormat(CommonConstants.DATE_FORMAT_ONLY_DATE_BACKEND, CommonConstants.MY_LOCALE);
         sdf.setTimeZone(TimeZone.getTimeZone(CommonConstants.TIMEZONE));
         txnDate = sdf.format(mTransaction.getCreate_time());
 

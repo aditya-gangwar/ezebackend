@@ -14,12 +14,9 @@ import in.ezeshop.database.InternalUser;
 import in.ezeshop.database.MerchantIdBatches;
 import in.ezeshop.messaging.SmsConstants;
 import in.ezeshop.messaging.SmsHelper;
-import in.ezeshop.utilities.BackendOps;
-import in.ezeshop.utilities.BackendUtils;
-import in.ezeshop.utilities.MyLogger;
+import in.ezeshop.utilities.*;
 import in.ezeshop.common.database.*;
 import in.ezeshop.common.constants.*;
-import in.ezeshop.utilities.SecurityHelper;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -252,7 +249,7 @@ public class AdminServices implements IBackendlessService {
             case DbConstants.OP_ACC_CLOSURE:
                 DateUtil now = new DateUtil(CommonConstants.TIMEZONE);
                 now.addDays(MyGlobalSettings.getMchntExpiryDays());
-                SimpleDateFormat sdf = new SimpleDateFormat(CommonConstants.DATE_FORMAT_ONLY_DATE_DISPLAY, CommonConstants.DATE_LOCALE);
+                SimpleDateFormat sdf = new SimpleDateFormat(CommonConstants.DATE_FORMAT_ONLY_DATE_DISPLAY, CommonConstants.MY_LOCALE);
                 sdf.setTimeZone(TimeZone.getTimeZone(CommonConstants.TIMEZONE));
 
                 smsText = String.format(SmsConstants.SMS_ADMIN_MCHNT_ACC_CLOSURE,
@@ -310,7 +307,7 @@ public class AdminServices implements IBackendlessService {
             BackendOps.loginUser(ADMIN_LOGINID,adminPwd);
 
             // fetch customer object
-            Customers customer = BackendOps.getCustomer(customerId, CommonUtils.getCustomerIdType(customerId), false);
+            Customers customer = BackendOps.getCustomer(customerId, IdGenerator.getCustomerIdType(customerId), false);
             mEdr[BackendConstants.EDR_MCHNT_ID_IDX] = customer.getPrivate_id();
 
             int oldStatus = customer.getAdmin_status();

@@ -31,12 +31,10 @@ import in.ezeshop.common.constants.*;
  */
 public class BackendUtils {
 
-    private static final SimpleDateFormat mSdfDateTimeFilename = new SimpleDateFormat(CommonConstants.DATE_FORMAT_WITH_TIME_FILENAME, CommonConstants.DATE_LOCALE);
-    private static final SimpleDateFormat mSdfTimeDay = new SimpleDateFormat(CommonConstants.DATE_FORMAT_DDMMYY, CommonConstants.DATE_LOCALE);
+    private static final SimpleDateFormat mSdfDateTimeFilename = new SimpleDateFormat(CommonConstants.DATE_FORMAT_WITH_TIME_FILENAME, CommonConstants.MY_LOCALE);
+    private static final SimpleDateFormat mSdfTimeDay = new SimpleDateFormat(CommonConstants.DATE_FORMAT_DDMMYY, CommonConstants.MY_LOCALE);
 
-    /*
-     * Password & ID generators
-     */
+
     public static String generateTempPassword() {
         // random alphanumeric string
         Random random = new Random();
@@ -46,51 +44,6 @@ public class BackendUtils {
         }
         return new String(id);
     }
-
-    public static String generateMerchantId(MerchantIdBatches batch, String countryCode, long regCounter) {
-        // 8 digit merchant id format:
-        // <1-3 digit country code> + <0-2 digit range id> + <2 digit batch id> + <3 digit s.no.>
-        int serialNo = (int) (regCounter % BackendConstants.MERCHANT_ID_MAX_SNO_PER_BATCH);
-        return countryCode + batch.getRangeBatchId() + String.format("%03d", serialNo);
-    }
-
-    public static String generateTxnId(String merchantId) {
-        // Txn Id : <7 chars for curr time in secs as Base35> + <6 char for merchant id as Base26> = total 13 chars
-        long timeSecs = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
-        long mchntIdLong = Long.parseUnsignedLong(merchantId);
-        return Base35.fromBase10(timeSecs, 7) + Base25.fromBase10(mchntIdLong, 6);
-    }
-
-    public static String generateLogId() {
-        // random alphanumeric string
-        Random random = new Random();
-        char[] id = new char[BackendConstants.LOG_ID_LEN];
-        for (int i = 0; i < BackendConstants.LOG_ID_LEN; i++) {
-            id[i] = BackendConstants.pwdChars[random.nextInt(BackendConstants.pwdChars.length)];
-        }
-        return new String(id);
-    }
-
-    public static String generateCustAddrId(String custPrivId) {
-        // Id : <6 chars for customer private id> + <6 char for own epoch time in 10 secs block> = total 12 chars
-        long myTimeSecs = Math.round(CommonUtils.getMyEpochSecs() / 10);
-        return custPrivId + Base35.fromBase10(myTimeSecs, 6);
-    }
-
-    public static String generateAreaId() {
-        Random random = new Random();
-        return Base35.fromBase10(random.nextLong(), 0);
-    }
-
-    /*public static String generateMchntOrderId() {
-        mSdfTimeDay.setTimeZone(TimeZone.getTimeZone(CommonConstants.TIMEZONE));
-        String day = mSdfTimeDay.format(new Date());
-        Long orderCnt =  BackendOps.fetchCounterValue(DbConstantsBackend.ORDER_ID_COUNTER);
-
-        // Order Id : <MO>+<4 chars for curr day in ddMMyy format> + <daily counter>
-        return CommonConstants.MCHNT_ORDER_ID_PREFIX + Base35.fromBase10(Long.parseLong(day), 4) + orderCnt.toString();
-    }*/
-
 
     /*
      * Fetches User by given DB 'objectId'
@@ -500,62 +453,9 @@ public class BackendUtils {
         return null;
     }
 
-
-    /*
-     * Get User ID type - depending upon the length
-     */
-    public static int getMerchantIdType(String id) {
-        switch (id.length()) {
-            case CommonConstants.MOBILE_NUM_LENGTH:
-                return CommonConstants.ID_TYPE_MOBILE;
-            case CommonConstants.MERCHANT_ID_LEN:
-                return CommonConstants.ID_TYPE_AUTO;
-            default:
-                throw new BackendlessException(String.valueOf(ErrorCodes.WRONG_INPUT_DATA), "Invalid Merchant ID: "+id);
-        }
-    }
-
-    public static int getCustomerIdType(String id) {
-        switch (id.length()) {
-            case CommonConstants.MOBILE_NUM_LENGTH:
-                return CommonConstants.ID_TYPE_MOBILE;
-            case CommonConstants.CUSTOMER_INTERNAL_ID_LEN:
-                return CommonConstants.ID_TYPE_AUTO;
-            /*case CommonConstants.CUSTOMER_CARDID_LEN:
-                return CommonConstants.ID_TYPE_CARD;*/
-            default:
-                throw new BackendlessException(String.valueOf(ErrorCodes.WRONG_INPUT_DATA), "Invalid Customer ID: "+id);
-        }
-    }
-
     /*public static boolean isCardNum(String id) {
         return (id.length()==CommonConstants.CUSTOMER_CARDID_LEN);
     }*/
-
-    /*
-     * Get User type - depending upon the length of ID
-     */
-    public static int getUserType(String userdId) {
-        switch(userdId.length()) {
-            case CommonConstants.MERCHANT_ID_LEN:
-                return DbConstants.USER_TYPE_MERCHANT;
-            case CommonConstants.INTERNAL_USER_ID_LEN:
-                if(userdId.startsWith(CommonConstants.PREFIX_AGENT_ID)) {
-                    return DbConstants.USER_TYPE_AGENT;
-                } else if(userdId.startsWith(CommonConstants.PREFIX_CC_ID)) {
-                    return DbConstants.USER_TYPE_CC;
-                } /*else if(userdId.startsWith(CommonConstants.PREFIX_CCNT_ID)) {
-                    return DbConstants.USER_TYPE_CCNT;
-                } */else {
-                    throw new BackendlessException(String.valueOf(ErrorCodes.USER_WRONG_ID_PASSWD),"Invalid user type for id: "+userdId);
-                }
-            case CommonConstants.CUSTOMER_INTERNAL_ID_LEN:
-            case CommonConstants.MOBILE_NUM_LENGTH:
-                return DbConstants.USER_TYPE_CUSTOMER;
-            default:
-                throw new BackendlessException(String.valueOf(ErrorCodes.NO_SUCH_USER),"Invalid user type for id: "+userdId);
-        }
-    }
 
     /*
      * Checks if for particular transaction - Card/PIN is required
@@ -773,7 +673,7 @@ public class BackendUtils {
             Long merchantCnt =  BackendOps.fetchCounterValue(DbConstantsBackend.MERCHANT_ID_COUNTER);
             mLogger.debug("Fetched merchant cnt: "+merchantCnt);
             // generate merchant id
-            merchantId = BackendUtils.generateMerchantId(batch, countryCode, merchantCnt);
+            merchantId = IdGenerator.generateMerchantId(batch, countryCode, merchantCnt);
             mLogger.debug("Generated merchant id: "+merchantId);
 
             // rename mchnt dp to include 'merchant id'

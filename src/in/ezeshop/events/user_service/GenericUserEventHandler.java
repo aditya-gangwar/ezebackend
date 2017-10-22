@@ -11,6 +11,7 @@ import in.ezeshop.database.InternalUser;
 import in.ezeshop.database.InternalUserDevice;
 import in.ezeshop.utilities.BackendOps;
 import in.ezeshop.utilities.BackendUtils;
+import in.ezeshop.utilities.IdGenerator;
 import in.ezeshop.utilities.MyLogger;
 
 import java.util.*;
@@ -243,7 +244,7 @@ public class GenericUserEventHandler extends com.backendless.servercode.extensio
 
             } else {
                 // Login failed for some reason
-                Integer userType = BackendUtils.getUserType(login);
+                Integer userType = IdGenerator.getUserType(login);
                 mEdr[BackendConstants.EDR_USER_TYPE_IDX] = userType.toString();
 
                 // login failed - increase count if failed due to wrong password
