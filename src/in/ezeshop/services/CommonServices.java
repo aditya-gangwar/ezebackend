@@ -79,6 +79,10 @@ public class CommonServices implements IBackendlessService {
                     throw new BackendlessException(String.valueOf(ErrorCodes.WRONG_INPUT_DATA),
                             "Provided Merchant Id don't match: " + userId);
                 }
+                merchant.setMsgDevId(deviceId);
+                merchant = BackendOps.saveMerchant(merchant);
+                devId = merchant.getMsgDevId();
+
             } else if (userType == DbConstants.USER_TYPE_CC ||
                     userType == DbConstants.USER_TYPE_AGENT) {
                 // TBD

@@ -10,6 +10,7 @@ import in.ezeshop.common.database.CustomerOps;
 import in.ezeshop.constants.BackendConstants;
 import in.ezeshop.constants.DbConstantsBackend;
 import in.ezeshop.database.InternalUser;
+import in.ezeshop.messaging.PushNotifier;
 import in.ezeshop.utilities.BackendOps;
 import in.ezeshop.utilities.BackendUtils;
 import in.ezeshop.utilities.IdGenerator;
@@ -97,7 +98,16 @@ public class CustomerServices implements IBackendlessService {
             order.setCustComments(comments);
             order.setPrescrips(prescrips);
             order.setId(IdGenerator.genCustOrderId(mchntId));
+            // order state
+            order.setCurrStatus(DbConstants.CUSTOMER_ORDER_STATUS.New.toString());
+            order.setPrevStatus("");
+            order.setStatusChgByUserType(DbConstants.USER_TYPE_CUSTOMER);
+            order.setStatusChgReason("");
+            // save in DB
             order = BackendOps.saveCustOrder(order);
+
+            // Send in app notification to merchant
+            //PushNotifier.pushNotification(text,text,mchnt.getMsg(),mEdr,mLogger);
 
             // Set NIDB fields - after saving in DB
             BackendUtils.remSensitiveData(mchnt);
