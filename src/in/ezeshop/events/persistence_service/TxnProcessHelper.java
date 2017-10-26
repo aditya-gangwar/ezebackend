@@ -172,6 +172,9 @@ public class TxnProcessHelper {
                 // along with updated transaction object to calling app,
                 // which can thus use it to display updated balance - instead of fetching cashback again.
                 // 3) cashback object in transaction will be used in afterCreate() of txn table too - to get updated balance
+                //
+                // As 'Transaction' table will be exported to CSV file at EoD
+                // so there wont be much back-pointers in 'Cashback' table pointing to 'Transaction' table row
                 mTransaction.setCashback(cashback);
 
                 if(saveAlso) {
@@ -189,7 +192,7 @@ public class TxnProcessHelper {
 
                     } catch (Throwable ex) {
                         if(ex instanceof Exception) {
-                            BackendUtils.handleException((Exception)ex, false, mLogger, mEdr);
+                            BackendUtils.handleException(ex, false, mLogger, mEdr);
                         } else {
                             mEdr[BackendConstants.EDR_RESULT_IDX] = BackendConstants.BACKEND_EDR_RESULT_NOK;
                             mLogger.error("Exception in " + mEdr[BackendConstants.EDR_API_NAME_IDX] + ": " + ex.toString());

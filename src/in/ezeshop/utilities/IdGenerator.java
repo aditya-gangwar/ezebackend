@@ -28,15 +28,6 @@ public class IdGenerator {
      * No IDs should be without pre-defined prefix - Except Merchant ID
      */
 
-    // user facing id prefixes - in caps
-    private static String TXN_ID_PREFIX = "T";
-    private static String CUST_ORDER_ID_PREFIX = "C";
-    // internal id prefixes - in small
-    private static String CUST_PRIVATE_ID_PREFIX = "i";
-    private static String CUST_ADDR_ID_PREFIX = "a";
-    private static String AREA_ID_PREFIX = "r";
-    private static String CUST_PRESCRIPTION_ID_PREFIX = "p";
-
     private static Long mCustPrescripIdBreaker;
 
     /*
@@ -64,7 +55,7 @@ public class IdGenerator {
 
     public synchronized static String generateTxnId(String merchantId) {
         // Chances of clash - i.e. merchants with same end 5 digits trying to do txn in same second is very low
-        return TXN_ID_PREFIX + merchantId.substring(merchantId.length()-5) + CommonUtils.getMyEpochSecs();
+        return CommonConstants.TXN_ID_PREFIX + merchantId.substring(merchantId.length()-5) + CommonUtils.getMyEpochSecs();
 
         // Txn Id: <prefix> + <mchnt id as base 35> + <my epoch time in secs as base35>
         //long mchntIdLong = Long.parseUnsignedLong(merchantId);
@@ -79,7 +70,7 @@ public class IdGenerator {
     public synchronized static String genCustOrderId(String merchantId) {
         // Chances of clash - i.e. merchants with same end 5 digits getting order in same second is very low
         // using last digits of merchantId instead of customerId - as merchants are very less compared to customers
-        return CUST_PRIVATE_ID_PREFIX + merchantId.substring(merchantId.length()-5) + CommonUtils.getMyEpochSecs();
+        return CommonConstants.CUST_PRIVATE_ID_PREFIX + merchantId.substring(merchantId.length()-5) + CommonUtils.getMyEpochSecs();
     }
 
     /*
@@ -89,7 +80,7 @@ public class IdGenerator {
     public synchronized static String genCustPrivateId(String merchantId) {
         // Chances of clash - i.e. merchants with same end 6 digits, registering customer in same second is very very low
         long num = Long.parseUnsignedLong(merchantId.substring(merchantId.length()-6) + CommonUtils.getMyEpochSecs());
-        return CUST_ORDER_ID_PREFIX + Base35.fromBase10(num,0);
+        return CommonConstants.CUST_ORDER_ID_PREFIX + Base35.fromBase10(num,0);
 
         //Long customerCnt =  BackendOps.fetchCounterValue(DbConstantsBackend.CUSTOMER_ID_COUNTER);
         //return Base35.fromBase10(customerCnt, CommonConstants.CUSTOMER_INTERNAL_ID_LEN);
@@ -97,7 +88,7 @@ public class IdGenerator {
 
     public synchronized static String generateCustAddrId(String custPrivId) {
         // as custPrivId is already in Base35 - so using last 5 digits instead of 6
-        return CUST_ADDR_ID_PREFIX + custPrivId.substring(custPrivId.length()-5) + Base35.fromBase10(CommonUtils.getMyEpochSecs(),0);
+        return CommonConstants.CUST_ADDR_ID_PREFIX + custPrivId.substring(custPrivId.length()-5) + Base35.fromBase10(CommonUtils.getMyEpochSecs(),0);
 
         // Id : <6 chars for customer private id> + <6 char for own epoch time in 10 secs block> = total 12 chars
         //long myTimeSecs = Math.round(CommonUtils.getMyEpochSecs() / 10);
@@ -106,7 +97,7 @@ public class IdGenerator {
 
     public synchronized static String generateAreaId() {
         Random random = new Random();
-        return AREA_ID_PREFIX + Base35.fromBase10(random.nextLong(), 0);
+        return CommonConstants.AREA_ID_PREFIX + Base35.fromBase10(random.nextLong(), 0);
     }
 
     // firstPrescripInSet: Indicates that if this is first prescription in the order set or not.
@@ -125,7 +116,7 @@ public class IdGenerator {
         }
 
         // as custPrivId is already in Base35 - so using last 5 digits instead of 6
-        return CUST_PRESCRIPTION_ID_PREFIX + custPrivId.substring(custPrivId.length()-5) + Base35.fromBase10(mCustPrescripIdBreaker,0);
+        return CommonConstants.CUST_PRESCRIPTION_ID_PREFIX + custPrivId.substring(custPrivId.length()-5) + Base35.fromBase10(mCustPrescripIdBreaker,0);
     }
 
     public synchronized static String generateLogId() {
@@ -163,7 +154,7 @@ public class IdGenerator {
     }
 
     public static int getCustomerIdType(String id) {
-        if(id.startsWith(CUST_PRIVATE_ID_PREFIX)) {
+        if(id.startsWith(CommonConstants.CUST_PRIVATE_ID_PREFIX)) {
             return CommonConstants.ID_TYPE_AUTO;
 
         } else if(id.length()==CommonConstants.MOBILE_NUM_LENGTH) {
@@ -178,7 +169,7 @@ public class IdGenerator {
      */
     public static int getUserType(String userId) {
 
-        if(userId.startsWith(CUST_PRIVATE_ID_PREFIX)) {
+        if(userId.startsWith(CommonConstants.CUST_PRIVATE_ID_PREFIX)) {
             return DbConstants.USER_TYPE_CUSTOMER;
 
         } else {

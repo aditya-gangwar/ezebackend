@@ -23,6 +23,9 @@ public class SmsConstants {
 
     // TODO: Review all SMS text
 
+    // Customer order messages
+    public static String MSG_CUST_ORDER_NOTIF_TO_MCHNT = "You have received a new Order from '%s'. Please do attend it within next 1 hour.";
+
     // SMS against Manual Requests by Merchant
     public static String SMS_ADMIN_MCHNT_SEND_PSWD_RESET_HINT = "Dear MyeCash Merchant - As per request, your password reset hint is '%s'. You can use the same to generate new password. PLS CALL CUSTOMER CARE IF NOT REQUESTED BY YOU.";
     public static String SMS_ADMIN_MCHNT_MOBILE_CHANGE = "Dear MyeCash Merchant - As per request, registered mobile number of your account '%s' is changed successfully to '%s'. Don't forget to remove any Lost Mobile device from your Trusted Device List. PLS CALL CUSTOMER CARE IF NOT REQUESTED BY YOU.";

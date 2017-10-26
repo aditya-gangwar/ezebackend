@@ -3,8 +3,13 @@
   <component name="ChangeListManager">
     <list default="true" id="ebc44ac1-614c-4d02-a020-2866a6df6bea" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/in/ezeshop/services/CommonServices.java" afterPath="$PROJECT_DIR$/src/in/ezeshop/services/CommonServices.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/in/ezeshop/events/persistence_service/TxnProcessHelper.java" afterPath="$PROJECT_DIR$/src/in/ezeshop/events/persistence_service/TxnProcessHelper.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/in/ezeshop/messaging/SmsConstants.java" afterPath="$PROJECT_DIR$/src/in/ezeshop/messaging/SmsConstants.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/in/ezeshop/services/CustomerServices.java" afterPath="$PROJECT_DIR$/src/in/ezeshop/services/CustomerServices.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/in/ezeshop/services/MerchantServices.java" afterPath="$PROJECT_DIR$/src/in/ezeshop/services/MerchantServices.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/in/ezeshop/utilities/BackendOps.java" afterPath="$PROJECT_DIR$/src/in/ezeshop/utilities/BackendOps.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/in/ezeshop/utilities/BackendUtils.java" afterPath="$PROJECT_DIR$/src/in/ezeshop/utilities/BackendUtils.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/in/ezeshop/utilities/IdGenerator.java" afterPath="$PROJECT_DIR$/src/in/ezeshop/utilities/IdGenerator.java" />
     </list>
     <ignored path="ezebackend.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -52,12 +57,10 @@
         <option value="$PROJECT_DIR$/src/in/ezeshop/services/InternalUserServicesNoLogin.java" />
         <option value="$PROJECT_DIR$/../ezeshop/common/src/main/java/in/ezeshop/common/constants/GlobalSettingConstants.java" />
         <option value="$PROJECT_DIR$/../ezeshop/common/src/main/java/in/ezeshop/common/MyGlobalSettings.java" />
-        <option value="$PROJECT_DIR$/../ezeshop/common/src/main/java/in/ezeshop/common/database/Cashback.java" />
         <option value="$PROJECT_DIR$/src/in/ezeshop/timers/MerchantPasswdResetTimer.java" />
         <option value="$PROJECT_DIR$/src/in/ezeshop/services/CustomerServicesNoLogin.java" />
         <option value="$PROJECT_DIR$/src/in/ezeshop/services/MerchantServicesNoLogin.java" />
         <option value="$PROJECT_DIR$/src/in/ezeshop/services/InternalUserServices.java" />
-        <option value="$PROJECT_DIR$/src/in/ezeshop/messaging/SmsConstants.java" />
         <option value="$PROJECT_DIR$/src/in/ezeshop/messaging/PushNotifier.java" />
         <option value="$PROJECT_DIR$/src/in/ezeshop/messaging/SmsHelper.java" />
         <option value="$PROJECT_DIR$/src/in/ezeshop/constants/BackendConstants.java" />
@@ -65,20 +68,23 @@
         <option value="$PROJECT_DIR$/../ezeshop/common/src/main/java/in/ezeshop/common/database/Address.java" />
         <option value="$PROJECT_DIR$/../ezeshop/common/src/main/java/in/ezeshop/common/Base35.java" />
         <option value="$PROJECT_DIR$/src/in/ezeshop/utilities/Base25.java" />
-        <option value="$PROJECT_DIR$/../ezeshop/common/src/main/java/in/ezeshop/common/constants/CommonConstants.java" />
         <option value="$PROJECT_DIR$/../ezeshop/common/src/main/java/in/ezeshop/common/CommonUtils.java" />
-        <option value="$PROJECT_DIR$/src/in/ezeshop/utilities/BackendUtils.java" />
-        <option value="$PROJECT_DIR$/src/in/ezeshop/utilities/IdGenerator.java" />
-        <option value="$PROJECT_DIR$/src/in/ezeshop/utilities/BackendOps.java" />
         <option value="$PROJECT_DIR$/src/in/ezeshop/utilities/MyLogger.java" />
         <option value="$PROJECT_DIR$/src/in/ezeshop/services/AdminServices.java" />
         <option value="$PROJECT_DIR$/src/in/ezeshop/events/user_service/GenericUserEventHandler.java" />
-        <option value="$PROJECT_DIR$/src/in/ezeshop/events/persistence_service/TxnProcessHelper.java" />
-        <option value="$PROJECT_DIR$/src/in/ezeshop/services/MerchantServices.java" />
         <option value="$PROJECT_DIR$/../ezeshop/common/src/main/java/in/ezeshop/common/database/CustomerOrder.java" />
         <option value="$PROJECT_DIR$/../ezeshop/common/src/main/java/in/ezeshop/common/constants/DbConstants.java" />
-        <option value="$PROJECT_DIR$/src/in/ezeshop/services/CustomerServices.java" />
         <option value="$PROJECT_DIR$/src/in/ezeshop/services/CommonServices.java" />
+        <option value="$PROJECT_DIR$/src/in/ezeshop/messaging/SmsConstants.java" />
+        <option value="$PROJECT_DIR$/../ezeshop/common/src/main/java/in/ezeshop/common/constants/CommonConstants.java" />
+        <option value="$PROJECT_DIR$/src/in/ezeshop/utilities/IdGenerator.java" />
+        <option value="$PROJECT_DIR$/../ezeshop/common/src/main/java/in/ezeshop/common/database/Merchants.java" />
+        <option value="$PROJECT_DIR$/../ezeshop/common/src/main/java/in/ezeshop/common/database/Cashback.java" />
+        <option value="$PROJECT_DIR$/src/in/ezeshop/utilities/BackendUtils.java" />
+        <option value="$PROJECT_DIR$/src/in/ezeshop/utilities/BackendOps.java" />
+        <option value="$PROJECT_DIR$/src/in/ezeshop/services/CustomerServices.java" />
+        <option value="$PROJECT_DIR$/src/in/ezeshop/services/MerchantServices.java" />
+        <option value="$PROJECT_DIR$/src/in/ezeshop/events/persistence_service/TxnProcessHelper.java" />
       </list>
     </option>
   </component>
@@ -113,6 +119,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
+      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -121,10 +129,118 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
           </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ezebackend" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ezebackend" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ezebackend" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ezebackend" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="in" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ezeshop" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ezebackend" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ezebackend" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="in" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ezeshop" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="utilities" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ezebackend" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ezebackend" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="in" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ezeshop" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="services" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ezebackend" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ezebackend" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="in" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ezeshop" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="messaging" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
         </subPane>
       </pane>
-      <pane id="Scratches" />
-      <pane id="Scope" />
       <pane id="PackagesPane" />
     </panes>
   </component>
@@ -486,7 +602,14 @@
       <option name="project" value="LOCAL" />
       <updated>1508708838909</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="22 Oct">
+      <created>1508793078823</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1508793078823</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -504,7 +627,7 @@
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.26289397" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25358167" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -551,13 +674,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/in/ezeshop/services/CustomerServicesNoLogin.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="159">
-          <caret line="259" column="60" selection-start-line="259" selection-start-column="60" selection-end-line="259" selection-end-column="60" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/in/ezeshop/services/MerchantServicesNoLogin.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="159">
@@ -644,13 +760,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/in/ezeshop/messaging/SmsConstants.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="8" column="0" selection-start-line="7" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../ezeshop/common/src/main/java/in/ezeshop/common/database/Cities.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="68">
@@ -670,7 +779,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1190">
           <caret line="70" column="62" selection-start-line="70" selection-start-column="31" selection-end-line="70" selection-end-column="62" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -688,41 +796,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../ezeshop/common/src/main/java/in/ezeshop/common/MyMerchant.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="429">
-          <caret line="84" column="39" selection-start-line="84" selection-start-column="18" selection-end-line="84" selection-end-column="39" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../ezeshop/common/src/main/java/in/ezeshop/common/database/Merchants.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="692">
-          <caret line="51" column="0" selection-start-line="11" selection-start-column="0" selection-end-line="51" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../ezeshop/common/src/main/java/in/ezeshop/common/CsvConverter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="446">
-          <caret line="231" column="11" selection-start-line="231" selection-start-column="11" selection-end-line="231" selection-end-column="11" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../ezeshop/common/src/main/java/in/ezeshop/common/database/Cashback.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="242">
-          <caret line="134" column="14" selection-start-line="134" selection-start-column="14" selection-end-line="134" selection-end-column="14" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://C:/Program Files/Java/jdk1.8.0_77/src.zip!/java/util/ArrayList.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="242">
           <caret line="149" column="11" selection-start-line="149" selection-start-column="11" selection-end-line="149" selection-end-column="11" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -730,13 +807,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="306">
           <caret line="21" column="20" selection-start-line="21" selection-start-column="20" selection-end-line="21" selection-end-column="20" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../ezeshop/common/src/main/java/in/ezeshop/common/database/CustAddress.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="10" column="30" selection-start-line="10" selection-start-column="30" selection-end-line="10" selection-end-column="30" />
         </state>
       </provider>
     </entry>
@@ -751,7 +821,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="408">
           <caret line="24" column="8" selection-start-line="24" selection-start-column="8" selection-end-line="24" selection-end-column="8" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -774,10 +843,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="242">
           <caret line="103" column="11" selection-start-line="103" selection-start-column="11" selection-end-line="103" selection-end-column="11" />
-          <folding>
-            <element signature="e#3504#3505#0" expanded="false" />
-            <element signature="e#3562#3563#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -785,19 +850,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="242">
           <caret line="398" column="30" selection-start-line="398" selection-start-column="30" selection-end-line="398" selection-end-column="30" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/in/ezeshop/utilities/BackendOps.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="242">
-          <caret line="127" column="28" selection-start-line="127" selection-start-column="28" selection-end-line="127" selection-end-column="28" />
-          <folding>
-            <marker date="1508700003600" expanded="false" signature="12553:12564" ph=" { " />
-            <marker date="1508700003600" expanded="false" signature="12608:12614" ph=" }" />
-            <marker date="1508700003600" expanded="false" signature="44773:44784" ph=" { " />
-            <marker date="1508700003600" expanded="false" signature="44829:44835" ph=" }" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -825,30 +877,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../ezeshop/common/src/main/java/in/ezeshop/common/constants/CommonConstants.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="259">
-          <caret line="43" column="0" selection-start-line="43" selection-start-column="0" selection-end-line="43" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../ezeshop/common/src/main/java/in/ezeshop/common/CommonUtils.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="420">
-          <caret line="231" column="26" selection-start-line="231" selection-start-column="26" selection-end-line="231" selection-end-column="26" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/in/ezeshop/utilities/BackendUtils.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-217">
-          <caret line="505" column="23" selection-start-line="505" selection-start-column="23" selection-end-line="505" selection-end-column="23" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/in/ezeshop/messaging/SmsHelper.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-51">
@@ -857,78 +885,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/in/ezeshop/utilities/IdGenerator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="284">
-          <caret line="30" column="0" selection-start-line="30" selection-start-column="0" selection-end-line="30" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../ezeshop/common/src/main/java/in/ezeshop/common/database/CustomerOrder.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="629">
           <caret line="42" column="44" selection-start-line="42" selection-start-column="44" selection-end-line="42" selection-end-column="44" />
-          <folding>
-            <element signature="e#955#956#0" expanded="true" />
-            <element signature="e#987#988#0" expanded="true" />
-            <element signature="e#1047#1048#0" expanded="true" />
-            <element signature="e#1095#1096#0" expanded="true" />
-            <element signature="e#1140#1141#0" expanded="true" />
-            <element signature="e#1176#1177#0" expanded="true" />
-            <element signature="e#1245#1246#0" expanded="true" />
-            <element signature="e#1301#1302#0" expanded="true" />
-            <element signature="e#1336#1337#0" expanded="true" />
-            <element signature="e#1363#1364#0" expanded="true" />
-            <element signature="e#1413#1414#0" expanded="true" />
-            <element signature="e#1451#1452#0" expanded="true" />
-            <element signature="e#1486#1487#0" expanded="true" />
-            <element signature="e#1513#1514#0" expanded="true" />
-            <element signature="e#1563#1564#0" expanded="true" />
-            <element signature="e#1601#1602#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../ezeshop/common/src/main/java/in/ezeshop/common/constants/DbConstants.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1224">
-          <caret line="162" column="21" selection-start-line="162" selection-start-column="21" selection-end-line="162" selection-end-column="21" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/in/ezeshop/events/persistence_service/TxnProcessHelper.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="446">
-          <caret line="524" column="90" selection-start-line="524" selection-start-column="12" selection-end-line="524" selection-end-column="90" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/in/ezeshop/messaging/PushNotifier.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="17" column="41" selection-start-line="17" selection-start-column="41" selection-end-line="17" selection-end-column="41" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/in/ezeshop/services/MerchantServices.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="956" column="17" selection-start-line="956" selection-start-column="17" selection-end-line="956" selection-end-column="17" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/in/ezeshop/services/CustomerServices.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="374">
-          <caret line="109" column="14" selection-start-line="109" selection-start-column="14" selection-end-line="109" selection-end-column="14" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -936,6 +896,158 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="674">
           <caret line="90" column="38" selection-start-line="90" selection-start-column="38" selection-end-line="90" selection-end-column="38" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/in/ezeshop/messaging/SmsConstants.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="26" column="39" selection-start-line="26" selection-start-column="39" selection-end-line="26" selection-end-column="39" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/in/ezeshop/messaging/PushNotifier.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="204">
+          <caret line="17" column="26" selection-start-line="17" selection-start-column="26" selection-end-line="17" selection-end-column="26" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../ezeshop/common/src/main/java/in/ezeshop/common/database/CustAddress.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="119">
+          <caret line="10" column="30" selection-start-line="10" selection-start-column="30" selection-end-line="10" selection-end-column="30" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../ezeshop/common/src/main/java/in/ezeshop/common/database/Merchants.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="221">
+          <caret line="18" column="27" selection-start-line="18" selection-start-column="27" selection-end-line="18" selection-end-column="27" />
+          <folding>
+            <element signature="e#5580#5581#0" expanded="true" />
+            <element signature="e#5610#5611#0" expanded="true" />
+            <element signature="e#5666#5667#0" expanded="true" />
+            <element signature="e#5710#5711#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../ezeshop/common/src/main/java/in/ezeshop/common/constants/CommonConstants.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="573">
+          <caret line="155" column="45" selection-start-line="155" selection-start-column="25" selection-end-line="155" selection-end-column="45" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/in/ezeshop/utilities/IdGenerator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="693">
+          <caret line="171" column="45" selection-start-line="171" selection-start-column="45" selection-end-line="171" selection-end-column="45" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../ezeshop/common/src/main/java/in/ezeshop/common/constants/DbConstants.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="692">
+          <caret line="162" column="21" selection-start-line="162" selection-start-column="21" selection-end-line="162" selection-end-column="21" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../ezeshop/common/src/main/java/in/ezeshop/common/CommonUtils.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="242">
+          <caret line="195" column="25" selection-start-line="195" selection-start-column="25" selection-end-line="195" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../ezeshop/common/src/main/java/in/ezeshop/common/database/Cashback.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="527">
+          <caret line="38" column="33" selection-start-line="38" selection-start-column="2" selection-end-line="38" selection-end-column="33" />
+          <folding>
+            <element signature="e#1062#1063#0" expanded="true" />
+            <element signature="e#1091#1092#0" expanded="true" />
+            <element signature="e#1148#1149#0" expanded="true" />
+            <element signature="e#1190#1191#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://C:/Program Files/Java/jdk1.8.0_77/src.zip!/java/util/Map.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="242">
+          <caret line="341" column="18" selection-start-line="341" selection-start-column="18" selection-end-line="341" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../ezeshop/common/src/main/java/in/ezeshop/common/MyMerchant.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="6" column="16" selection-start-line="6" selection-start-column="16" selection-end-line="6" selection-end-column="16" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/in/ezeshop/services/CustomerServices.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="289">
+          <caret line="129" column="47" selection-start-line="129" selection-start-column="27" selection-end-line="129" selection-end-column="47" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/in/ezeshop/services/MerchantServices.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="357">
+          <caret line="44" column="50" selection-start-line="44" selection-start-column="40" selection-end-line="44" selection-end-column="50" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/in/ezeshop/events/persistence_service/TxnProcessHelper.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="204">
+          <caret line="72" column="42" selection-start-line="72" selection-start-column="42" selection-end-line="72" selection-end-column="42" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/in/ezeshop/utilities/BackendUtils.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="497">
+          <caret line="796" column="24" selection-start-line="796" selection-start-column="24" selection-end-line="796" selection-end-column="24" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/in/ezeshop/utilities/BackendOps.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="183">
+          <caret line="166" column="49" selection-start-line="166" selection-start-column="49" selection-end-line="166" selection-end-column="49" />
+          <folding>
+            <marker date="1509018734213" expanded="false" signature="12778:12789" ph=" { " />
+            <marker date="1509018734213" expanded="false" signature="12833:12839" ph=" }" />
+            <marker date="1509018734213" expanded="false" signature="44998:45009" ph=" { " />
+            <marker date="1509018734213" expanded="false" signature="45054:45060" ph=" }" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../ezeshop/common/src/main/java/in/ezeshop/common/CsvConverter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="378">
+          <caret line="236" column="32" selection-start-line="236" selection-start-column="32" selection-end-line="236" selection-end-column="32" />
           <folding />
         </state>
       </provider>

@@ -414,6 +414,7 @@ public class MerchantServices implements IBackendlessService {
             // Add 'customer details' in the cashback object to be returned
             // these details are not stored in DB along with cashback object
             cashback.setOther_details(MyCustomer.toCsvString(customer));
+            // As called by merchant user - so not adding merchant object
             stripCashback(cashback);
 
             // no exception - means function execution success

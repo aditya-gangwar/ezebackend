@@ -164,7 +164,7 @@ public class BackendOps {
         }
     }
 
-    public static List<Merchants> fetchMerchants(List<String> autoIds, boolean addressChild, MyLogger logger) {
+    public static Map<String, Merchants> fetchMerchants(List<String> autoIds, boolean addressChild, MyLogger logger) {
         BackendlessDataQuery query = new BackendlessDataQuery();
 
         // build where clause
@@ -192,21 +192,25 @@ public class BackendOps {
             throw new BackendlessException(String.valueOf(ErrorCodes.NO_SUCH_USER), errorMsg);
         }
 
-        ArrayList<Merchants> objects = new ArrayList<>();
+        Map<String, Merchants> objects = new HashMap<>(users.getTotalObjects());
         while (users.getCurrentPage().size() > 0)
         {
-            objects.addAll(users.getData());
+            Iterator<Merchants> iterator = users.getCurrentPage().iterator();
+            while( iterator.hasNext() )
+            {
+                objects.put(iterator.next().getAuto_id(), iterator.next());
+            }
             users = users.nextPage();
         }
 
         // fetch area objects, and attach to 'address' object in merchant
         if(addressChild) {
             List<String> areaIds = new ArrayList<>(objects.size());
-            for (Merchants m : objects) {
+            for (Merchants m : objects.values()) {
                 areaIds.add(m.getAddress().getAreaId());
             }
             HashMap<String, Areas> areas = fetchAreas(areaIds, logger);
-            for (Merchants mchnt : objects) {
+            for (Merchants mchnt : objects.values()) {
                 mchnt.getAddress().setAreaNIDB(areas.get(mchnt.getAddress().getAreaId()));
             }
         }

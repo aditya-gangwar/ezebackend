@@ -5,12 +5,12 @@ import com.backendless.BackendlessCollection;
 import com.backendless.exceptions.BackendlessException;
 import com.backendless.files.FileInfo;
 import com.backendless.servercode.IBackendlessService;
-import in.ezeshop.common.MyMerchant;
 import in.ezeshop.common.database.CustomerOps;
 import in.ezeshop.constants.BackendConstants;
 import in.ezeshop.constants.DbConstantsBackend;
 import in.ezeshop.database.InternalUser;
 import in.ezeshop.messaging.PushNotifier;
+import in.ezeshop.messaging.SmsConstants;
 import in.ezeshop.utilities.BackendOps;
 import in.ezeshop.utilities.BackendUtils;
 import in.ezeshop.utilities.IdGenerator;
@@ -19,6 +19,7 @@ import in.ezeshop.utilities.MyLogger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.LogManager;
 
 import in.ezeshop.common.database.*;
@@ -107,7 +108,8 @@ public class CustomerServices implements IBackendlessService {
             order = BackendOps.saveCustOrder(order);
 
             // Send in app notification to merchant
-            //PushNotifier.pushNotification(text,text,mchnt.getMsg(),mEdr,mLogger);
+            String msg = String.format(CommonConstants.MY_LOCALE, SmsConstants.MSG_CUST_ORDER_NOTIF_TO_MCHNT, customer.getName());
+            PushNotifier.pushNotification(msg,msg,mchnt.getMsgDevId(),mEdr,mLogger);
 
             // Set NIDB fields - after saving in DB
             BackendUtils.remSensitiveData(mchnt);
@@ -155,7 +157,7 @@ public class CustomerServices implements IBackendlessService {
 
             // Fetch merchant ids delivering in given area
             List<String> mchntIds= BackendOps.fetchMchntsForDlvry(areadId);
-            List<Merchants> mchnts = BackendOps.fetchMerchants(mchntIds, true, mLogger);
+            List<Merchants> mchnts = new ArrayList<>(BackendOps.fetchMerchants(mchntIds, true, mLogger).values());
             // remove sensitive data from all objects
             for (Merchants mchnt : mchnts) {
                 BackendUtils.remSensitiveData(mchnt);
@@ -310,10 +312,20 @@ public class CustomerServices implements IBackendlessService {
                     if(cbs==null) {
                         cbs= new ArrayList<>();
                     }
+
+                    List<String> mchntIds = new ArrayList<>(cbs.size());
+                    for (Cashback cb : data) {
+                        mchntIds.add(cb.getMerchant_id());
+                    }
+                    Map<String, Merchants> mchnts = BackendOps.fetchMerchants(mchntIds,true,mLogger);
+                    for (Cashback cb : data) {
+                        cb.setMerchantNIDB(mchnts.get(cb.getMerchant_id()));
+                    }
+
                     // dont want to send complete merchant objects
                     // convert the required info into a CSV string
                     // and send as other_details column of the cashback object
-                    for (Cashback cb : data) {
+                    /*for (Cashback cb : data) {
                         try {
                             Merchants merchant = BackendOps.getMerchant(cb.getMerchant_id(), false, true);
                             cb.setOther_details(MyMerchant.toCsvString(merchant));
@@ -326,7 +338,7 @@ public class CustomerServices implements IBackendlessService {
                                     cb.getMerchant_id()+", "+custPrivateId,e);
                             mEdr[BackendConstants.EDR_IGNORED_ERROR_IDX] = BackendConstants.IGNORED_ERROR_CB_WITH_NO_MCHNT;
                         }
-                    }
+                    }*/
                 }
             }
 

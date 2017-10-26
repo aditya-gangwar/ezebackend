@@ -779,7 +779,7 @@ public class BackendUtils {
         }
     }
 
-    public static void remSensitiveData(Merchants merchant) {
+    public static Merchants remSensitiveData(Merchants merchant) {
         // Remove sensitive data that should not be visible to other users like Customer
         merchant.setDob("");
         merchant.setEmail("");
@@ -792,7 +792,9 @@ public class BackendUtils {
         merchant.setDelLocalFilesReq(null);
         merchant.setCl_credit_limit_for_pin(-1);
         merchant.setCl_debit_limit_for_pin(-1);
+        merchant.setMsgDevId("");
 
+        return merchant;
         // calling to this fx. means - merchant object is sent to other users like Customer
         // As other users anyways wont be allowed to update Merchant object
         // so removing object Id too
