@@ -70,7 +70,7 @@ public class IdGenerator {
     public synchronized static String genCustOrderId(String merchantId) {
         // Chances of clash - i.e. merchants with same end 5 digits getting order in same second is very low
         // using last digits of merchantId instead of customerId - as merchants are very less compared to customers
-        return CommonConstants.CUST_PRIVATE_ID_PREFIX + merchantId.substring(merchantId.length()-5) + CommonUtils.getMyEpochSecs();
+        return CommonConstants.CUST_ORDER_ID_PREFIX + merchantId.substring(merchantId.length()-5) + CommonUtils.getMyEpochSecs();
     }
 
     /*
@@ -80,7 +80,7 @@ public class IdGenerator {
     public synchronized static String genCustPrivateId(String merchantId) {
         // Chances of clash - i.e. merchants with same end 6 digits, registering customer in same second is very very low
         long num = Long.parseUnsignedLong(merchantId.substring(merchantId.length()-6) + CommonUtils.getMyEpochSecs());
-        return CommonConstants.CUST_ORDER_ID_PREFIX + Base35.fromBase10(num,0);
+        return CommonConstants.CUST_PRIVATE_ID_PREFIX + Base35.fromBase10(num,0);
 
         //Long customerCnt =  BackendOps.fetchCounterValue(DbConstantsBackend.CUSTOMER_ID_COUNTER);
         //return Base35.fromBase10(customerCnt, CommonConstants.CUSTOMER_INTERNAL_ID_LEN);

@@ -198,7 +198,8 @@ public class BackendOps {
             Iterator<Merchants> iterator = users.getCurrentPage().iterator();
             while( iterator.hasNext() )
             {
-                objects.put(iterator.next().getAuto_id(), iterator.next());
+                Merchants mchnt = iterator.next();
+                objects.put(mchnt.getAuto_id(), mchnt);
             }
             users = users.nextPage();
         }

@@ -320,6 +320,7 @@ public class CustomerServices implements IBackendlessService {
                     Map<String, Merchants> mchnts = BackendOps.fetchMerchants(mchntIds,true,mLogger);
                     for (Cashback cb : data) {
                         cb.setMerchantNIDB(mchnts.get(cb.getMerchant_id()));
+                        cbs.add(cb);
                     }
 
                     // dont want to send complete merchant objects
