@@ -93,6 +93,8 @@ public class CustomerServices implements IBackendlessService {
             // Create order object and save
             CustomerOrder order = new CustomerOrder();
             order.setCustPrivId(custId);
+            order.setCustName(customer.getName());
+            order.setCustMobile(customer.getMobile_num());
             order.setMerchantId(mchntId);
             order.setAddressId(addressId);
             order.setCreateTime(new Date());

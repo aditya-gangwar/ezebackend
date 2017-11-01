@@ -11,6 +11,7 @@ import in.ezeshop.common.*;
 import in.ezeshop.constants.BackendConstants;
 import in.ezeshop.constants.DbConstantsBackend;
 import in.ezeshop.database.AllOtp;
+import in.ezeshop.database.InternalUser;
 import in.ezeshop.utilities.*;
 import in.ezeshop.events.persistence_service.TxnProcessHelper;
 import in.ezeshop.messaging.SmsConstants;
@@ -37,6 +38,48 @@ public class MerchantServices implements IBackendlessService {
      * Public methods: Backend REST APIs
      * Merchant operations
      */
+    public List<CustomerOrder> fetchPendingOrders(String merchantId) {
+        long startTime = System.currentTimeMillis();
+        mEdr[BackendConstants.EDR_START_TIME_IDX] = String.valueOf(startTime);
+        mEdr[BackendConstants.EDR_API_NAME_IDX] = "fetchPendingOrders";
+
+        boolean validException = false;
+        try {
+            mLogger.debug("In fetchPendingOrders");
+
+            // Fetch customer - send userType param as null to avoid checking within fetchCurrentUser fx.
+            // But check immediately after
+            Object userObj = BackendUtils.fetchCurrentUser(null, mEdr, mLogger, false);
+            int userType = Integer.parseInt(mEdr[BackendConstants.EDR_USER_TYPE_IDX]);
+
+            Merchants merchant = null;
+            if(userType==DbConstants.USER_TYPE_MERCHANT) {
+                merchant = (Merchants) userObj;
+                mEdr[BackendConstants.EDR_CUST_ID_IDX] = merchant.getAuto_id();
+
+            } else if(userType==DbConstants.USER_TYPE_CC) {
+                InternalUser user = (InternalUser) userObj;
+                merchant = BackendOps.getMerchant(merchantId, false, false);
+                mEdr[BackendConstants.EDR_INTERNAL_USER_ID_IDX] = user.getId();
+
+            } else {
+                mEdr[BackendConstants.EDR_SPECIAL_FLAG_IDX] = BackendConstants.BACKEND_EDR_SECURITY_BREACH;
+                throw new BackendlessException(String.valueOf(ErrorCodes.OPERATION_NOT_ALLOWED), "Operation not allowed to this user");
+            }
+
+            // Fetch pending orders for this merchant
+            List<CustomerOrder> orders = BackendOps.fetchPendingOrders(merchant.getAuto_id(),mLogger);
+            mEdr[BackendConstants.EDR_RESULT_IDX] = BackendConstants.BACKEND_EDR_RESULT_OK;
+            return orders;
+
+        } catch(Exception e) {
+            BackendUtils.handleException(e,validException,mLogger,mEdr);
+            throw e;
+        } finally {
+            BackendUtils.finalHandling(startTime,mLogger,mEdr);
+        }
+    }
+
     /*public Transaction cancelTxn(String txnId, String cardId, String pin, boolean isOtp) {
         TxnProcessHelper txnEventHelper = new TxnProcessHelper();
         return txnEventHelper.cancelTxn(InvocationContext.getUserId(), txnId, cardId, pin, isOtp);

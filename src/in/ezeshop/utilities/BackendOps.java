@@ -1199,6 +1199,56 @@ public class BackendOps {
         return objects;
     }
 
+    public static HashMap<String, CustAddress> fetchCustAddresses(List<String> idList, MyLogger logger) {
+        Backendless.Data.mapTableToClass("CustAddress", CustAddress.class);
+
+        // build where clause
+        String whereClause = null;
+        for (String id : idList) {
+            if (whereClause == null) {
+                whereClause = "id = '" + id + "'";
+            } else {
+                whereClause = whereClause + " OR id = '" + id + "'";
+            }
+        }
+
+        BackendlessDataQuery query = new BackendlessDataQuery();
+        if(whereClause!=null) {
+            logger.debug("fetchAreas: whereClause: "+whereClause);
+            query.setWhereClause(whereClause);
+        }
+
+        BackendlessCollection<CustAddress> collection = Backendless.Data.of( CustAddress.class ).find(query);
+        int cnt = collection.getTotalObjects();
+        if( cnt == 0) {
+            String errorMsg = "No Addresses found: "+query.getWhereClause();
+            throw new BackendlessException(String.valueOf(ErrorCodes.NO_DATA_FOUND), errorMsg);
+        }
+
+        HashMap<String, CustAddress> objects = new HashMap<>();
+        while (collection.getCurrentPage().size() > 0)
+        {
+            Iterator<CustAddress> iterator = collection.getCurrentPage().iterator();
+            while (iterator.hasNext()) {
+                CustAddress item = iterator.next();
+                objects.put(item.getId(), item);
+            }
+            collection = collection.nextPage();
+        }
+
+        // fetch area objects, and attach to 'custAddress' objects
+        List<String> areaIds = new ArrayList<>(CommonConstants.MAX_ADDRESS_PER_CUSTOMER);
+        for (CustAddress addr: objects.values()) {
+            areaIds.add(addr.getAreaId());
+        }
+        HashMap<String, Areas> areas = fetchAreas(areaIds, logger);
+        for (CustAddress addr: objects.values()) {
+            addr.setAreaNIDB(areas.get(addr.getAreaId()));
+        }
+
+        return objects;
+    }
+
     public static CustAddress getAddress(String id) {
         if(id==null || id.isEmpty()) {
             return null;
@@ -1348,6 +1398,50 @@ public class BackendOps {
         Backendless.Data.mapTableToClass("CustomerOrder", CustomerOrder.class);
         return Backendless.Persistence.save(order);
     }
+
+    public static List<CustomerOrder> fetchPendingOrders(String mchntId, MyLogger logger) {
+        Backendless.Data.mapTableToClass("CustomerOrder", CustomerOrder.class);
+        Backendless.Data.mapTableToClass("Prescriptions", Prescriptions.class);
+
+        BackendlessDataQuery query = new BackendlessDataQuery();
+        query.setPageSize(CommonConstants.DB_QUERY_PAGE_SIZE);
+
+        // build where clause
+        String whereClause = "merchantId = '" + mchntId + "' AND " + DbConstants.CUSTOMER_ORDER_STATUS.getPendingWhereClause();
+        logger.debug("In fetchPendingOrders: "+whereClause);
+        query.setWhereClause(whereClause);
+
+        QueryOptions queryOptions = new QueryOptions();
+        queryOptions.addRelated("prescrips");
+        query.setQueryOptions(queryOptions);
+
+        BackendlessCollection<CustomerOrder> orders = Backendless.Data.of( CustomerOrder.class ).find(query);
+        if( orders.getTotalObjects() == 0) {
+            String errorMsg = "No Orders found: "+query.getWhereClause();
+            throw new BackendlessException(String.valueOf(ErrorCodes.NO_SUCH_USER), errorMsg);
+        }
+
+        List<CustomerOrder> objects = new ArrayList<>(orders.getTotalObjects());
+        while (orders.getCurrentPage().size() > 0)
+        {
+            objects.addAll(orders.getData());
+            orders = orders.nextPage();
+        }
+
+        // fetch 'address' objects
+        List<String> addressIds = new ArrayList<>(objects.size());
+        for (CustomerOrder item: objects) {
+            addressIds.add(item.getAddressId());
+        }
+        HashMap<String, CustAddress> addresses = fetchCustAddresses(addressIds, logger);
+        for (CustomerOrder order: objects) {
+            order.setAddressNIDB(addresses.get(order.getAddressId()));
+        }
+
+        return objects;
+
+    }
+
 
     /*
      * Bulk Operations via REST
