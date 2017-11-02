@@ -38,7 +38,8 @@ public class MerchantServices implements IBackendlessService {
      * Public methods: Backend REST APIs
      * Merchant operations
      */
-    public List<CustomerOrder> fetchPendingOrders(String merchantId) {
+    public java.util.List<CustomerOrder> fetchPendingOrders(java.lang.String merchantId) {
+        BackendUtils.initAll();
         long startTime = System.currentTimeMillis();
         mEdr[BackendConstants.EDR_START_TIME_IDX] = String.valueOf(startTime);
         mEdr[BackendConstants.EDR_API_NAME_IDX] = "fetchPendingOrders";

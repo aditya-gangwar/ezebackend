@@ -1179,7 +1179,7 @@ public class BackendOps {
             logger.debug("Fetched Cust Addresses: "+cnt);
         }
 
-        List<CustAddress> objects = new ArrayList<>();
+        List<CustAddress> objects = new ArrayList<>(cnt);
         while (collection.getCurrentPage().size() > 0)
         {
             objects.addAll(collection.getData());
@@ -1214,7 +1214,7 @@ public class BackendOps {
 
         BackendlessDataQuery query = new BackendlessDataQuery();
         if(whereClause!=null) {
-            logger.debug("fetchAreas: whereClause: "+whereClause);
+            logger.debug("fetchCustAddresses: whereClause: "+whereClause);
             query.setWhereClause(whereClause);
         }
 
