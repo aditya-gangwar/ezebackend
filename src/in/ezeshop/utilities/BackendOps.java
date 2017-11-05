@@ -1249,7 +1249,7 @@ public class BackendOps {
         return objects;
     }
 
-    public static CustAddress getAddress(String id) {
+    public static CustAddress getCustAddress(String id) {
         if(id==null || id.isEmpty()) {
             return null;
         }
@@ -1394,6 +1394,55 @@ public class BackendOps {
     /*
      * Customer Order functions
      */
+
+    // This does not fetch any child objects
+    public static CustomerOrder getCustomerOrder(String orderId, MyLogger logger) {
+        Backendless.Data.mapTableToClass("CustomerOrder", CustomerOrder.class);
+        Backendless.Data.mapTableToClass("Prescriptions", Prescriptions.class);
+
+        BackendlessDataQuery query = new BackendlessDataQuery();
+        query.setPageSize(CommonConstants.DB_QUERY_PAGE_SIZE);
+
+        // build where clause
+        String whereClause = "id = '" + orderId + "'";
+        query.setWhereClause(whereClause);
+
+        QueryOptions queryOptions = new QueryOptions();
+        queryOptions.addRelated("prescrips");
+        query.setQueryOptions(queryOptions);
+
+        BackendlessCollection<CustomerOrder> orders = Backendless.Data.of( CustomerOrder.class ).find(query);
+        if( orders.getTotalObjects() == 0) {
+            String errorMsg = "No Orders found: "+query.getWhereClause();
+            throw new BackendlessException(String.valueOf(ErrorCodes.NO_SUCH_USER), errorMsg);
+        }
+
+        return orders.getData().get(0);
+
+        /*CustomerOrder order = orders.getData().get(0);
+        order.setAddressNIDB(getCustAddress(order.getAddressId()));
+
+        List<CustomerOrder> objects = new ArrayList<>(orders.getTotalObjects());
+        while (orders.getCurrentPage().size() > 0)
+        {
+            objects.addAll(orders.getData());
+            orders = orders.nextPage();
+        }
+
+        // fetch 'address' objects
+        List<String> addressIds = new ArrayList<>(objects.size());
+        for (CustomerOrder item: objects) {
+            addressIds.add(item.getAddressId());
+        }
+        HashMap<String, CustAddress> addresses = fetchCustAddresses(addressIds, logger);
+        for (CustomerOrder order: objects) {
+            order.setAddressNIDB(addresses.get(order.getAddressId()));
+        }
+
+        return objects;*/
+
+    }
+
     public static CustomerOrder saveCustOrder(CustomerOrder order) {
         Backendless.Data.mapTableToClass("CustomerOrder", CustomerOrder.class);
         return Backendless.Persistence.save(order);

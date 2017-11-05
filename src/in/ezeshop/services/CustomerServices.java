@@ -1,9 +1,7 @@
 
 package in.ezeshop.services;
 
-import com.backendless.BackendlessCollection;
 import com.backendless.exceptions.BackendlessException;
-import com.backendless.files.FileInfo;
 import com.backendless.servercode.IBackendlessService;
 import in.ezeshop.common.database.CustomerOps;
 import in.ezeshop.constants.BackendConstants;
@@ -20,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.LogManager;
 
 import in.ezeshop.common.database.*;
 import in.ezeshop.common.constants.*;
@@ -56,7 +53,7 @@ public class CustomerServices implements IBackendlessService {
             // 1) Valid Address should exist
             // 2) Valid Merchant should exist
             // 3) Either 'prescription' or 'comments' should be provided
-            CustAddress addr = BackendOps.getAddress(addressId);
+            CustAddress addr = BackendOps.getCustAddress(addressId);
             if(addr==null) {
                 mEdr[BackendConstants.EDR_SPECIAL_FLAG_IDX] = BackendConstants.BACKEND_EDR_SECURITY_BREACH;
                 throw new BackendlessException(String.valueOf(ErrorCodes.WRONG_INPUT_DATA),"Invalid Delivery Address: " + addressId);
@@ -110,7 +107,7 @@ public class CustomerServices implements IBackendlessService {
             order = BackendOps.saveCustOrder(order);
 
             // Send in app notification to merchant
-            String msg = String.format(CommonConstants.MY_LOCALE, SmsConstants.MSG_CUST_ORDER_NOTIF_TO_MCHNT, customer.getName());
+            String msg = String.format(CommonConstants.MY_LOCALE, SmsConstants.MSG_NEW_ORDER_TO_MCHNT, customer.getName());
             PushNotifier.pushNotification(msg,msg,mchnt.getMsgDevId(),mEdr,mLogger);
 
             // Set NIDB fields - after saving in DB
@@ -211,7 +208,7 @@ public class CustomerServices implements IBackendlessService {
                 mLogger.debug("Cust Address edit case: "+addr.getId());
 
                 // Fetch corresponding custAddress record from DB
-                CustAddress addrDb = BackendOps.getAddress(addr.getId());
+                CustAddress addrDb = BackendOps.getCustAddress(addr.getId());
                 // copy all fields that can be edited
                 addrDb.setContactNum(addr.getContactNum());
                 addrDb.setText1(addr.getText1());
