@@ -1414,7 +1414,7 @@ public class BackendOps {
         BackendlessCollection<CustomerOrder> orders = Backendless.Data.of( CustomerOrder.class ).find(query);
         if( orders.getTotalObjects() == 0) {
             String errorMsg = "No Orders found: "+query.getWhereClause();
-            throw new BackendlessException(String.valueOf(ErrorCodes.NO_SUCH_USER), errorMsg);
+            throw new BackendlessException(String.valueOf(ErrorCodes.NO_DATA_FOUND), errorMsg);
         }
 
         return orders.getData().get(0);
@@ -1467,7 +1467,7 @@ public class BackendOps {
         BackendlessCollection<CustomerOrder> orders = Backendless.Data.of( CustomerOrder.class ).find(query);
         if( orders.getTotalObjects() == 0) {
             String errorMsg = "No Orders found: "+query.getWhereClause();
-            throw new BackendlessException(String.valueOf(ErrorCodes.NO_SUCH_USER), errorMsg);
+            throw new BackendlessException(String.valueOf(ErrorCodes.NO_DATA_FOUND), errorMsg);
         }
 
         List<CustomerOrder> objects = new ArrayList<>(orders.getTotalObjects());
