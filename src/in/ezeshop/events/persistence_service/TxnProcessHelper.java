@@ -59,7 +59,6 @@ public class TxnProcessHelper {
                 HeadersManager.getInstance().addHeader(HeadersManager.HeadersEnum.USER_TOKEN_KEY, userToken);
             }*/
 
-            //mTransaction = txn;
             mTransaction = CsvConverter.txnFromCsvStr(txnCsvStr);
             mTransaction.setCpin(argPin);
 
@@ -71,8 +70,13 @@ public class TxnProcessHelper {
 
             // print roles - for debug purpose
             BackendUtils.printCtxtInfo(mLogger);
-            /*List<String> roles = Backendless.UserService.getUserRoles();
-            mLogger.debug("Roles: "+roles.toString());*/
+
+            // If online order txn - fetch the order first
+            CustomerOrder order = null;
+            if(CommonUtils.isOnlineOrderTxn(mTransaction)) {
+                mLogger.debug("Online order transaction: "+mTransaction.getTrans_id());
+                order = BackendOps.getCustomerOrder(mTransaction.getTrans_id(), mLogger);
+            }
 
             // credit txns not allowed under expiry duration
             // txn cancellation is allowed
@@ -178,7 +182,7 @@ public class TxnProcessHelper {
                 mTransaction.setCashback(cashback);
 
                 if(saveAlso) {
-                    mTransaction = BackendOps.updateTxn(mTransaction, mMerchant.getTxn_table(), mMerchant.getCashback_table());
+                    mTransaction = BackendOps.saveTransaction(mTransaction, mMerchant.getTxn_table(), mMerchant.getCashback_table());
                 }
 
                 // any exception after above (like in sending sms) - should not result in failure msg to the caller
@@ -334,7 +338,7 @@ public class TxnProcessHelper {
 
                 // cashback will be updated along with txn
                 mTransaction.setCashback(cashback);
-                BackendOps.updateTxn(mTransaction, mMerchant.getTxn_table(), mMerchant.getCashback_table());
+                BackendOps.saveTransaction(mTransaction, mMerchant.getTxn_table(), mMerchant.getCashback_table());
 
                 // Build SMS
                 merchantName = mTransaction.getMerchant_name().toUpperCase(Locale.ENGLISH);

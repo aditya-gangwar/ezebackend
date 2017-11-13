@@ -40,7 +40,7 @@ public class MerchantServices implements IBackendlessService {
      * Merchant operations
      */
 
-    public CustomerOrder changeOrderStatus(String orderId, String argStatus, String reason) {
+    /*public Transaction changeOrderStatus(String orderId, String argStatus, String reason) {
         long startTime = System.currentTimeMillis();
         mEdr[BackendConstants.EDR_START_TIME_IDX] = String.valueOf(startTime);
         mEdr[BackendConstants.EDR_API_NAME_IDX] = "changeOrderStatus";
@@ -139,9 +139,9 @@ public class MerchantServices implements IBackendlessService {
         } finally {
             BackendUtils.finalHandling(startTime,mLogger,mEdr);
         }
-    }
+    }*/
 
-    public java.util.List<CustomerOrder> fetchPendingOrders(java.lang.String merchantId) {
+    /*public java.util.List<CustomerOrder> fetchPendingOrders(java.lang.String merchantId) {
         BackendUtils.initAll();
         long startTime = System.currentTimeMillis();
         mEdr[BackendConstants.EDR_START_TIME_IDX] = String.valueOf(startTime);
@@ -182,6 +182,53 @@ public class MerchantServices implements IBackendlessService {
         } finally {
             BackendUtils.finalHandling(startTime,mLogger,mEdr);
         }
+    }*/
+
+    public java.util.List<Transaction> fetchPendingOrders(java.lang.String merchantId) {
+        BackendUtils.initAll();
+        long startTime = System.currentTimeMillis();
+        mEdr[BackendConstants.EDR_START_TIME_IDX] = String.valueOf(startTime);
+        mEdr[BackendConstants.EDR_API_NAME_IDX] = "fetchPendingOrders";
+
+        boolean validException = false;
+        try {
+            mLogger.debug("In fetchPendingOrders");
+
+            // Fetch customer - send userType param as null to avoid checking within fetchCurrentUser fx.
+            // But check immediately after
+            Object userObj = BackendUtils.fetchCurrentUser(null, mEdr, mLogger, false);
+            int userType = Integer.parseInt(mEdr[BackendConstants.EDR_USER_TYPE_IDX]);
+
+            Merchants merchant = null;
+            if(userType==DbConstants.USER_TYPE_MERCHANT) {
+                merchant = (Merchants) userObj;
+                mEdr[BackendConstants.EDR_CUST_ID_IDX] = merchant.getAuto_id();
+
+            } else if(userType==DbConstants.USER_TYPE_CC) {
+                InternalUser user = (InternalUser) userObj;
+                merchant = BackendOps.getMerchant(merchantId, false, false);
+                mEdr[BackendConstants.EDR_INTERNAL_USER_ID_IDX] = user.getId();
+
+            } else {
+                mEdr[BackendConstants.EDR_SPECIAL_FLAG_IDX] = BackendConstants.BACKEND_EDR_SECURITY_BREACH;
+                throw new BackendlessException(String.valueOf(ErrorCodes.OPERATION_NOT_ALLOWED), "Operation not allowed to this user");
+            }
+
+            // Fetch pending orders for this merchant
+            String whereClause = "merchant_id = '" + merchant.getAuto_id() + "' AND status = '" + DbConstants.TRANSACTION_STATUS.Pending.toString()
+                    + "' AND custOrder is not null";
+            List<Transaction> orders = BackendOps.fetchTransactions(whereClause, merchant.getTxn_table());
+            //List<CustomerOrder> orders = BackendOps.fetchPendingOrders(merchant.getAuto_id(),mLogger);
+
+            mEdr[BackendConstants.EDR_RESULT_IDX] = BackendConstants.BACKEND_EDR_RESULT_OK;
+            return orders;
+
+        } catch(Exception e) {
+            BackendUtils.handleException(e,validException,mLogger,mEdr);
+            throw e;
+        } finally {
+            BackendUtils.finalHandling(startTime,mLogger,mEdr);
+        }
     }
 
     /*public Transaction cancelTxn(String txnId, String cardId, String pin, boolean isOtp) {
@@ -189,6 +236,7 @@ public class MerchantServices implements IBackendlessService {
         return txnEventHelper.cancelTxn(InvocationContext.getUserId(), txnId, cardId, pin, isOtp);
     }*/
 
+    // Taking txn as CSV string - as it anyways will have to be converted into one - for EDR purpose
     public Transaction commitTxn(String csvTxnData, String pin, boolean isOtp) throws Exception {
         TxnProcessHelper txnEventHelper = new TxnProcessHelper();
         return txnEventHelper.handleTxnCommit(InvocationContext.getUserId(), csvTxnData, pin, isOtp, true, true);

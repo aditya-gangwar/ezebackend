@@ -10,6 +10,7 @@ import in.ezeshop.common.MyErrorParams;
 import in.ezeshop.common.MyGlobalSettings;
 import in.ezeshop.constants.DbConstantsBackend;
 import in.ezeshop.database.AllOtp;
+import in.ezeshop.messaging.PushNotifier;
 import in.ezeshop.messaging.SmsHelper;
 import in.ezeshop.utilities.*;
 import in.ezeshop.constants.BackendConstants;
@@ -41,6 +42,126 @@ public class CommonServices implements IBackendlessService {
         } catch(Exception e) {
             BackendUtils.handleException(e,false,mLogger,mEdr);
             throw e;
+        }
+    }
+
+    public Transaction cancelOrder(String orderId, String merchantId, String reason) {
+        long startTime = System.currentTimeMillis();
+        mEdr[BackendConstants.EDR_START_TIME_IDX] = String.valueOf(startTime);
+        mEdr[BackendConstants.EDR_API_NAME_IDX] = "cancelOrder";
+        mEdr[BackendConstants.EDR_API_PARAMS_IDX] = orderId+BackendConstants.BACKEND_EDR_SUB_DELIMETER+
+                merchantId+BackendConstants.BACKEND_EDR_SUB_DELIMETER+
+                reason;
+
+        boolean validException = false;
+        try {
+            mLogger.debug("In cancelOrder: "+orderId);
+
+            // Send userType param as null to avoid checking within fetchCurrentUser fx.
+            // But check immediately after
+            Object userObj = BackendUtils.fetchCurrentUser(null, mEdr, mLogger, true);
+            int userType = Integer.parseInt(mEdr[BackendConstants.EDR_USER_TYPE_IDX]);
+
+            Merchants merchant = null;
+            Customers customer = null;
+            if (userType == DbConstants.USER_TYPE_MERCHANT) {
+                merchant = (Merchants) userObj;
+                mEdr[BackendConstants.EDR_MCHNT_ID_IDX] = merchant.getAuto_id();
+
+            } else if (userType == DbConstants.USER_TYPE_CUSTOMER) {
+                customer = (Customers) userObj;
+                mEdr[BackendConstants.EDR_CUST_ID_IDX] = customer.getPrivate_id();
+                merchant = BackendOps.getMerchant(merchantId, false, false);
+                mEdr[BackendConstants.EDR_MCHNT_ID_IDX] = merchant.getAuto_id();
+
+            } else {
+                mEdr[BackendConstants.EDR_SPECIAL_FLAG_IDX] = BackendConstants.BACKEND_EDR_SECURITY_BREACH;
+                throw new BackendlessException(String.valueOf(ErrorCodes.OPERATION_NOT_ALLOWED), "Operation not allowed to this user");
+            }
+
+            // Fetch order to be cancelled
+            Transaction txn = BackendOps.fetchTxn(orderId, merchant.getTxn_table(), merchant.getCashback_table());
+
+            // check if object belongs to the user requesting the operation
+            if( !merchant.getAuto_id().equals(txn.getMerchant_id()) ||
+                    (customer!=null && !customer.getPrivate_id().equals(txn.getCust_private_id())) ) {
+                mEdr[BackendConstants.EDR_SPECIAL_FLAG_IDX] = BackendConstants.BACKEND_EDR_SECURITY_BREACH;
+                throw new BackendlessException(String.valueOf(ErrorCodes.OPERATION_NOT_ALLOWED), "Operation not allowed to this user");
+            }
+
+            // check for state machine - this shud never fail, as already checked in app
+            String invalidStateChgMsg = null;
+            DbConstants.CUSTOMER_ORDER_STATUS currOrderStatus = DbConstants.CUSTOMER_ORDER_STATUS.fromString(txn.getCustOrder().getCurrStatus());
+            DbConstants.TRANSACTION_STATUS currTxnStatus = DbConstants.TRANSACTION_STATUS.fromString(txn.getStatus());
+            if(currTxnStatus != DbConstants.TRANSACTION_STATUS.Pending) {
+                invalidStateChgMsg = "Order is already closed.";
+            } else {
+                switch (userType) {
+                    case DbConstants.USER_TYPE_MERCHANT:
+                        // merchant is allowed to cancel order anytime until completed
+                        if (currOrderStatus == DbConstants.CUSTOMER_ORDER_STATUS.Delivered || currOrderStatus == DbConstants.CUSTOMER_ORDER_STATUS.Cancelled) {
+                            invalidStateChgMsg = currOrderStatus.toString() + " orders can't be cancelled.";
+                        }
+                        break;
+                    case DbConstants.USER_TYPE_CUSTOMER:
+                        // customer is allowed to cancel order only if not yet accepted by merchant
+                        if (currOrderStatus != DbConstants.CUSTOMER_ORDER_STATUS.New) {
+                            invalidStateChgMsg = currOrderStatus.toString() + " orders can't be cancelled.";
+                        }
+                        break;
+                }
+            }
+            if(invalidStateChgMsg!=null) {
+                mEdr[BackendConstants.EDR_SPECIAL_FLAG_IDX] = BackendConstants.BACKEND_EDR_SECURITY_BREACH;
+                throw new BackendlessException(String.valueOf(ErrorCodes.OPERATION_NOT_ALLOWED), invalidStateChgMsg);
+            }
+
+            // Change txn and order status
+            txn.setStatus(DbConstants.TRANSACTION_STATUS.toString(DbConstants.TRANSACTION_STATUS.Cancelled));
+            txn.getCustOrder().setCancelTime(new Date());
+            txn.getCustOrder().setStatusChgReason(reason);
+            txn.getCustOrder().setStatusChgByUserType(userType);
+            txn.getCustOrder().setPrevStatus(txn.getCustOrder().getCurrStatus());
+            txn.getCustOrder().setCurrStatus(DbConstants.CUSTOMER_ORDER_STATUS.toString(DbConstants.CUSTOMER_ORDER_STATUS.Cancelled));
+
+            Transaction dbTxn = BackendOps.saveTransaction(txn, merchant.getTxn_table(), merchant.getCashback_table());
+
+            // Send notification to the other party
+            try {
+                switch (userType) {
+                    case DbConstants.USER_TYPE_MERCHANT:
+                        customer = BackendOps.getCustomer(txn.getCust_private_id(), CommonConstants.ID_TYPE_AUTO, false);
+                        String msg = String.format(CommonConstants.MY_LOCALE, SmsConstants.MSG_ORDER_STATUS_CHG_TO_CUST,
+                                txn.getTrans_id(), "Cancelled", merchant.getName());
+                        if(customer.getMsgDevId()==null || customer.getMsgDevId().isEmpty()) {
+                            SmsHelper.sendSMS(msg, customer.getMobile_num(), mEdr, mLogger, true);
+                        } else {
+                            PushNotifier.pushNotification(msg, msg, customer.getMsgDevId(), mEdr, mLogger);
+                        }
+                        break;
+                    case DbConstants.USER_TYPE_CUSTOMER:
+                        msg = String.format(CommonConstants.MY_LOCALE, SmsConstants.MSG_ORDER_STATUS_CHG_TO_MCHNT,
+                                txn.getTrans_id(), "Cancelled");
+                        if(merchant.getMsgDevId()==null || merchant.getMsgDevId().isEmpty()) {
+                            SmsHelper.sendSMS(msg, merchant.getMobile_num(), mEdr, mLogger, true);
+                        } else {
+                            PushNotifier.pushNotification(msg, msg, merchant.getMsgDevId(), mEdr, mLogger);
+                        }
+                        break;
+                }
+            } catch (Exception e) {
+                // ignore exception
+                mLogger.error("In changeOrderStatus: Exception while sending notification.", e);
+            }
+
+            mEdr[BackendConstants.EDR_RESULT_IDX] = BackendConstants.BACKEND_EDR_RESULT_OK;
+            return dbTxn;
+
+        } catch(Exception e) {
+            BackendUtils.handleException(e,validException,mLogger,mEdr);
+            throw e;
+        } finally {
+            BackendUtils.finalHandling(startTime,mLogger,mEdr);
         }
     }
 

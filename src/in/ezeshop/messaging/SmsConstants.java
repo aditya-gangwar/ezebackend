@@ -26,7 +26,8 @@ public class SmsConstants {
     // Customer order messages
     public static String MSG_NEW_ORDER_TO_MCHNT = "You have received a new Order from '%s'. Please do attend it within next 1 hour.";
     //public static String MSG_CANCEL_ORDER_TO_CUST = "'%s' have cancelled your Order# %s. You can use app to send the same order to another merchant.";
-    public static String MSG_ORDER_STATUS_CHG_TO_CUST = "Your Order# %s is '%s' by '%s'. Check in app for more details.";
+    public static String MSG_ORDER_STATUS_CHG_TO_CUST = "Your Order# '%s' is '%s' by '%s'. Check in app for more details.";
+    public static String MSG_ORDER_STATUS_CHG_TO_MCHNT = "The Order# '%s' is '%s' by the customer. Check in app for more details.";
 
     // SMS against Manual Requests by Merchant
     public static String SMS_ADMIN_MCHNT_SEND_PSWD_RESET_HINT = "Dear MyeCash Merchant - As per request, your password reset hint is '%s'. You can use the same to generate new password. PLS CALL CUSTOMER CARE IF NOT REQUESTED BY YOU.";

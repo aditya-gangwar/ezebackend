@@ -93,6 +93,9 @@ public class BackendOps {
     }
 
     public static BackendlessUser fetchUserByObjectId(String objectId, boolean allMchntChilds) {
+        Backendless.Data.mapTableToClass("Customers", Customers.class);
+        Backendless.Data.mapTableToClass("Merchants", Merchants.class);
+
         if(objectId==null || objectId.isEmpty()) {
             // this usually happens, if same user logs in from anoter device
             // and then tries some request from first device
@@ -779,13 +782,18 @@ public class BackendOps {
      */
     public static List<Transaction> fetchTransactions(String whereClause, String tableName) {
         Backendless.Data.mapTableToClass(tableName, Transaction.class);
+        Backendless.Data.mapTableToClass("CustomerOrder", CustomerOrder.class);
         //Backendless.Data.mapTableToClass(cbTableName, Cashback.class);
 
         // fetch txns object from DB
         BackendlessDataQuery dataQuery = new BackendlessDataQuery();
         // sorted by create time
         //QueryOptions queryOptions = new QueryOptions("create_time");
-        //dataQuery.setQueryOptions(queryOptions);
+        QueryOptions queryOptions = new QueryOptions();
+        queryOptions.addRelated("custOrder");
+        queryOptions.addRelated("custOrder.prescrips");
+        dataQuery.setQueryOptions(queryOptions);
+
         dataQuery.setPageSize(CommonConstants.DB_QUERY_PAGE_SIZE);
         dataQuery.setWhereClause(whereClause);
 
@@ -813,6 +821,7 @@ public class BackendOps {
         BackendlessDataQuery dataQuery = new BackendlessDataQuery();
         QueryOptions queryOptions = new QueryOptions();
         queryOptions.addRelated("cashback");
+        queryOptions.addRelated("custOrder");
 
         dataQuery.setQueryOptions(queryOptions);
         dataQuery.setWhereClause("trans_id = '"+txnId+"'");
@@ -828,7 +837,7 @@ public class BackendOps {
         }
     }
 
-    public static Transaction updateTxn(Transaction txn, String tableName, String cbTableName) {
+    public static Transaction saveTransaction(Transaction txn, String tableName, String cbTableName) {
         Backendless.Data.mapTableToClass(tableName, Transaction.class);
         Backendless.Data.mapTableToClass(cbTableName, Cashback.class);
         return Backendless.Persistence.save(txn);
@@ -1249,7 +1258,7 @@ public class BackendOps {
         return objects;
     }
 
-    public static CustAddress getCustAddress(String id) {
+    public static CustAddress getCustAddress(String id, boolean areaChild) {
         if(id==null || id.isEmpty()) {
             return null;
         }
@@ -1263,13 +1272,18 @@ public class BackendOps {
         queryOptions.addRelated("area.city");
         query.setQueryOptions(queryOptions);*/
 
-        BackendlessCollection<CustAddress> addr = Backendless.Data.of( CustAddress.class ).find(query);
-        if( addr.getTotalObjects() == 0) {
+        CustAddress addr;
+        BackendlessCollection<CustAddress> addresses = Backendless.Data.of( CustAddress.class ).find(query);
+        if( addresses.getTotalObjects() == 0) {
             String errorMsg = "No Cust Address found: "+query.getWhereClause();
             throw new BackendlessException(String.valueOf(ErrorCodes.NO_DATA_FOUND), errorMsg);
         } else {
-            return addr.getData().get(0);
+            addr = addresses.getData().get(0);
+            if(areaChild) {
+                addr.setAreaNIDB(getArea(addr.getAreaId()));
+            }
         }
+        return addr;
     }
 
     public static CustAddress saveCustAddress(CustAddress addr) {
@@ -1418,29 +1432,6 @@ public class BackendOps {
         }
 
         return orders.getData().get(0);
-
-        /*CustomerOrder order = orders.getData().get(0);
-        order.setAddressNIDB(getCustAddress(order.getAddressId()));
-
-        List<CustomerOrder> objects = new ArrayList<>(orders.getTotalObjects());
-        while (orders.getCurrentPage().size() > 0)
-        {
-            objects.addAll(orders.getData());
-            orders = orders.nextPage();
-        }
-
-        // fetch 'address' objects
-        List<String> addressIds = new ArrayList<>(objects.size());
-        for (CustomerOrder item: objects) {
-            addressIds.add(item.getAddressId());
-        }
-        HashMap<String, CustAddress> addresses = fetchCustAddresses(addressIds, logger);
-        for (CustomerOrder order: objects) {
-            order.setAddressNIDB(addresses.get(order.getAddressId()));
-        }
-
-        return objects;*/
-
     }
 
     public static CustomerOrder saveCustOrder(CustomerOrder order) {
@@ -1478,14 +1469,14 @@ public class BackendOps {
         }
 
         // fetch 'address' objects
-        List<String> addressIds = new ArrayList<>(objects.size());
+        /*List<String> addressIds = new ArrayList<>(objects.size());
         for (CustomerOrder item: objects) {
             addressIds.add(item.getAddressId());
         }
         HashMap<String, CustAddress> addresses = fetchCustAddresses(addressIds, logger);
         for (CustomerOrder order: objects) {
             order.setAddressNIDB(addresses.get(order.getAddressId()));
-        }
+        }*/
 
         return objects;
 

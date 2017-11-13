@@ -3,6 +3,7 @@ package in.ezeshop.services;
 
 import com.backendless.exceptions.BackendlessException;
 import com.backendless.servercode.IBackendlessService;
+import in.ezeshop.common.CommonUtils;
 import in.ezeshop.common.database.CustomerOps;
 import in.ezeshop.constants.BackendConstants;
 import in.ezeshop.constants.DbConstantsBackend;
@@ -35,7 +36,7 @@ public class CustomerServices implements IBackendlessService {
      * Public methods: Backend REST APIs
      * Customer operations
      */
-    public CustomerOrder createCustomerOrder(String mchntId, String addressId, String comments, java.util.List<String> prescripUrls) {
+    public Transaction createCustomerOrder(String mchntId, String addressId, String comments, java.util.List<String> prescripUrls) {
         long startTime = System.currentTimeMillis();
         mEdr[BackendConstants.EDR_START_TIME_IDX] = String.valueOf(startTime);
         mEdr[BackendConstants.EDR_API_NAME_IDX] = "createCustomerOrder";
@@ -49,11 +50,14 @@ public class CustomerServices implements IBackendlessService {
             String custId = customer.getPrivate_id();
             mEdr[BackendConstants.EDR_CUST_ID_IDX] = custId;
 
+            // check if mCustomer is enabled
+            BackendUtils.checkCustomerStatus(customer, mEdr, mLogger);
+
             // Validations - Ideally none should fail, as already checked in app
             // 1) Valid Address should exist
             // 2) Valid Merchant should exist
             // 3) Either 'prescription' or 'comments' should be provided
-            CustAddress addr = BackendOps.getCustAddress(addressId);
+            CustAddress addr = BackendOps.getCustAddress(addressId, true);
             if(addr==null) {
                 mEdr[BackendConstants.EDR_SPECIAL_FLAG_IDX] = BackendConstants.BACKEND_EDR_SECURITY_BREACH;
                 throw new BackendlessException(String.valueOf(ErrorCodes.WRONG_INPUT_DATA),"Invalid Delivery Address: " + addressId);
@@ -89,34 +93,59 @@ public class CustomerServices implements IBackendlessService {
 
             // Create order object and save
             CustomerOrder order = new CustomerOrder();
+            order.setCreateTime(new Date());
+            order.setId(IdGenerator.genCustOrderId(mchntId));
+            // customer & mchnt details
             order.setCustPrivId(custId);
             order.setCustName(customer.getName());
             order.setCustMobile(customer.getMobile_num());
             order.setMerchantId(mchntId);
-            order.setAddressId(addressId);
-            order.setCreateTime(new Date());
             order.setCustComments(comments);
             order.setPrescrips(prescrips);
-            order.setId(IdGenerator.genCustOrderId(mchntId));
-            // order state
+            // delivery address
+            //order.setAddressId(addressId);
+            order.setDelvryToName(addr.getToName());
+            order.setDelvryContactNum(addr.getContactNum());
+            order.setDelvryAddrText(addr.getText1());
+            order.setDelvryAddrArea(addr.getAreaNIDB().getAreaName());
+            order.setDelvryAddrCity(addr.getAreaNIDB().getCity().getCity());
+            order.setDelvryAddrState(addr.getAreaNIDB().getCity().getState());
+            // order status
             order.setCurrStatus(DbConstants.CUSTOMER_ORDER_STATUS.New.toString());
             order.setPrevStatus("");
             order.setStatusChgByUserType(DbConstants.USER_TYPE_CUSTOMER);
             order.setStatusChgReason("");
+
+            // Create empty txn
+            Transaction txn = new Transaction();
+            txn.setTrans_id(order.getId());
+            txn.setCreate_time(new Date());
+            txn.setStatus(DbConstants.TRANSACTION_STATUS.Pending.toString());
+            txn.setMerchant_id(mchntId);
+            txn.setMerchant_name(mchnt.getName());
+            txn.setCust_private_id(custId);
+            txn.setCust_mobile(customer.getMobile_num());
+            txn.setArchived(false);
+            txn.setCpin(DbConstants.TXN_CUSTOMER_PIN_NOT_USED);
+            CommonUtils.resetTxnBillingDetails(txn);
+            // set order as child of txn
+            txn.setCustOrder(order);
+
             // save in DB
-            order = BackendOps.saveCustOrder(order);
+            Transaction dbTxn = BackendOps.saveTransaction(txn, mchnt.getTxn_table(), mchnt.getCashback_table());
+            //order = BackendOps.saveTransaction();
 
             // Send in app notification to merchant
             String msg = String.format(CommonConstants.MY_LOCALE, SmsConstants.MSG_NEW_ORDER_TO_MCHNT, customer.getName());
             PushNotifier.pushNotification(msg,msg,mchnt.getMsgDevId(),mEdr,mLogger);
 
-            // Set NIDB fields - after saving in DB
+            // Set NIDB fields - only after saving in DB
             BackendUtils.remSensitiveData(mchnt);
-            order.setMerchantNIDB(mchnt);
-            order.setAddressNIDB(addr);
+            txn.getCustOrder().setMerchantNIDB(mchnt);
+            //order.setAddressNIDB(addr);
 
             mEdr[BackendConstants.EDR_RESULT_IDX] = BackendConstants.BACKEND_EDR_RESULT_OK;
-            return order;
+            return dbTxn;
 
         } catch(Exception e) {
             BackendUtils.handleException(e,validException,mLogger,mEdr);
@@ -208,7 +237,7 @@ public class CustomerServices implements IBackendlessService {
                 mLogger.debug("Cust Address edit case: "+addr.getId());
 
                 // Fetch corresponding custAddress record from DB
-                CustAddress addrDb = BackendOps.getCustAddress(addr.getId());
+                CustAddress addrDb = BackendOps.getCustAddress(addr.getId(), false);
                 // copy all fields that can be edited
                 addrDb.setContactNum(addr.getContactNum());
                 addrDb.setText1(addr.getText1());
