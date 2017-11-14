@@ -1,4 +1,4 @@
-package in.ezeshop.events.persistence_service;
+package in.ezeshop.utilities;
 
 import com.backendless.exceptions.BackendlessException;
 import in.ezeshop.common.CommonUtils;

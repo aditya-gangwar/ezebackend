@@ -131,8 +131,8 @@ public class CommonServices implements IBackendlessService {
                 switch (userType) {
                     case DbConstants.USER_TYPE_MERCHANT:
                         customer = BackendOps.getCustomer(txn.getCust_private_id(), CommonConstants.ID_TYPE_AUTO, false);
-                        String msg = String.format(CommonConstants.MY_LOCALE, SmsConstants.MSG_ORDER_STATUS_CHG_TO_CUST,
-                                txn.getTrans_id(), "Cancelled", merchant.getName());
+                        String msg = String.format(CommonConstants.MY_LOCALE, SmsConstants.MSG_ORDER_CANCEL_TO_CUST,
+                                txn.getTrans_id(), merchant.getName());
                         if(customer.getMsgDevId()==null || customer.getMsgDevId().isEmpty()) {
                             SmsHelper.sendSMS(msg, customer.getMobile_num(), mEdr, mLogger, true);
                         } else {
@@ -140,8 +140,7 @@ public class CommonServices implements IBackendlessService {
                         }
                         break;
                     case DbConstants.USER_TYPE_CUSTOMER:
-                        msg = String.format(CommonConstants.MY_LOCALE, SmsConstants.MSG_ORDER_STATUS_CHG_TO_MCHNT,
-                                txn.getTrans_id(), "Cancelled");
+                        msg = String.format(CommonConstants.MY_LOCALE, SmsConstants.MSG_ORDER_CANCEL_TO_MCHNT, txn.getTrans_id());
                         if(merchant.getMsgDevId()==null || merchant.getMsgDevId().isEmpty()) {
                             SmsHelper.sendSMS(msg, merchant.getMobile_num(), mEdr, mLogger, true);
                         } else {

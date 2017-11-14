@@ -12,9 +12,8 @@ import in.ezeshop.constants.BackendConstants;
 import in.ezeshop.constants.DbConstantsBackend;
 import in.ezeshop.database.AllOtp;
 import in.ezeshop.database.InternalUser;
-import in.ezeshop.messaging.PushNotifier;
 import in.ezeshop.utilities.*;
-import in.ezeshop.events.persistence_service.TxnProcessHelper;
+import in.ezeshop.utilities.TxnProcessHelper;
 import in.ezeshop.messaging.SmsConstants;
 import in.ezeshop.messaging.SmsHelper;
 
@@ -39,150 +38,6 @@ public class MerchantServices implements IBackendlessService {
      * Public methods: Backend REST APIs
      * Merchant operations
      */
-
-    /*public Transaction changeOrderStatus(String orderId, String argStatus, String reason) {
-        long startTime = System.currentTimeMillis();
-        mEdr[BackendConstants.EDR_START_TIME_IDX] = String.valueOf(startTime);
-        mEdr[BackendConstants.EDR_API_NAME_IDX] = "changeOrderStatus";
-        mEdr[BackendConstants.EDR_API_PARAMS_IDX] = orderId+BackendConstants.BACKEND_EDR_SUB_DELIMETER+
-                argStatus+BackendConstants.BACKEND_EDR_SUB_DELIMETER+
-                reason;
-
-        boolean validException = false;
-        try {
-            mLogger.debug("In changeOrderStatus: "+orderId+", "+argStatus);
-
-            // Only merchant allowed to create order - internal user also not allowed
-            Merchants merchant = (Merchants) BackendUtils.fetchCurrentUser(DbConstants.USER_TYPE_MERCHANT, mEdr, mLogger, false);
-            String mchntId = merchant.getAuto_id();
-            mEdr[BackendConstants.EDR_MCHNT_ID_IDX] = mchntId;
-
-            CustomerOrder order = BackendOps.getCustomerOrder(orderId, mLogger);
-
-            // check for state machine - this shud never fail, as already checked in app
-            String invalidStateChgMsg = null;
-            DbConstants.CUSTOMER_ORDER_STATUS currStatus = DbConstants.CUSTOMER_ORDER_STATUS.fromString(order.getCurrStatus());
-            DbConstants.CUSTOMER_ORDER_STATUS newStatus = DbConstants.CUSTOMER_ORDER_STATUS.fromString(argStatus);
-            if(newStatus==null) {
-                invalidStateChgMsg = "Invalid new status value";
-            } else {
-                switch (currStatus) {
-                    case New:
-                        if (newStatus != DbConstants.CUSTOMER_ORDER_STATUS.Accepted && newStatus != DbConstants.CUSTOMER_ORDER_STATUS.Cancelled) {
-                            invalidStateChgMsg = "Invalid Status change from 'New' to '"+argStatus+"'.";
-                        }
-                        break;
-                    case Accepted:
-                        if (newStatus != DbConstants.CUSTOMER_ORDER_STATUS.Dispatched && newStatus != DbConstants.CUSTOMER_ORDER_STATUS.Cancelled) {
-                            invalidStateChgMsg = "Invalid Status change from 'Accepted' to '"+argStatus+"'.";
-                        }
-                        break;
-                    case Dispatched:
-                        if (newStatus != DbConstants.CUSTOMER_ORDER_STATUS.Delivered && newStatus != DbConstants.CUSTOMER_ORDER_STATUS.Cancelled) {
-                            invalidStateChgMsg = "Invalid Status change from 'Dispatched' to '"+argStatus+"'.";
-                        }
-                        break;
-                    case Delivered:
-                    case Cancelled:
-                        invalidStateChgMsg = "Status change not allowed for '"+order.getCurrStatus()+"' orders.";
-                        break;
-                }
-            }
-            if(invalidStateChgMsg!=null) {
-                mEdr[BackendConstants.EDR_SPECIAL_FLAG_IDX] = BackendConstants.BACKEND_EDR_SECURITY_BREACH;
-                throw new BackendlessException(String.valueOf(ErrorCodes.OPERATION_NOT_ALLOWED), invalidStateChgMsg);
-            }
-
-            // Change order status
-            order.setPrevStatus(order.getCurrStatus());
-            order.setCurrStatus(newStatus.toString());
-            switch (newStatus) {
-                case Accepted:
-                    order.setAcceptTime(new Date());
-                    break;
-                case Dispatched:
-                    order.setDispatchTime(new Date());
-                    break;
-                case Delivered:
-                    order.setDeliverTime(new Date());
-                    break;
-                case Cancelled:
-                    order.setCancelTime(new Date());
-                    break;
-            }
-            order.setStatusChgReason(reason);
-            order = BackendOps.saveCustOrder(order);
-
-            // Send notification to the customer
-            try {
-                Customers cust = BackendOps.getCustomer(order.getCustPrivId(), CommonConstants.ID_TYPE_AUTO, false);
-                String msg = String.format(CommonConstants.MY_LOCALE, SmsConstants.MSG_ORDER_STATUS_CHG_TO_CUST,
-                        orderId, order.getCurrStatus(), merchant.getName());
-
-                if(cust.getMsgDevId()==null || cust.getMsgDevId().isEmpty()) {
-                    SmsHelper.sendSMS(msg, cust.getMobile_num(), mEdr, mLogger, true);
-                } else {
-                    PushNotifier.pushNotification(msg, msg, cust.getMsgDevId(), mEdr, mLogger);
-                }
-
-            } catch (Exception e) {
-                // ignore exception
-                mLogger.error("In changeOrderStatus: Exception while sending notification.", e);
-            }
-
-            mEdr[BackendConstants.EDR_RESULT_IDX] = BackendConstants.BACKEND_EDR_RESULT_OK;
-            return order;
-
-        } catch(Exception e) {
-            BackendUtils.handleException(e,validException,mLogger,mEdr);
-            throw e;
-        } finally {
-            BackendUtils.finalHandling(startTime,mLogger,mEdr);
-        }
-    }*/
-
-    /*public java.util.List<CustomerOrder> fetchPendingOrders(java.lang.String merchantId) {
-        BackendUtils.initAll();
-        long startTime = System.currentTimeMillis();
-        mEdr[BackendConstants.EDR_START_TIME_IDX] = String.valueOf(startTime);
-        mEdr[BackendConstants.EDR_API_NAME_IDX] = "fetchPendingOrders";
-
-        boolean validException = false;
-        try {
-            mLogger.debug("In fetchPendingOrders");
-
-            // Fetch customer - send userType param as null to avoid checking within fetchCurrentUser fx.
-            // But check immediately after
-            Object userObj = BackendUtils.fetchCurrentUser(null, mEdr, mLogger, false);
-            int userType = Integer.parseInt(mEdr[BackendConstants.EDR_USER_TYPE_IDX]);
-
-            Merchants merchant = null;
-            if(userType==DbConstants.USER_TYPE_MERCHANT) {
-                merchant = (Merchants) userObj;
-                mEdr[BackendConstants.EDR_CUST_ID_IDX] = merchant.getAuto_id();
-
-            } else if(userType==DbConstants.USER_TYPE_CC) {
-                InternalUser user = (InternalUser) userObj;
-                merchant = BackendOps.getMerchant(merchantId, false, false);
-                mEdr[BackendConstants.EDR_INTERNAL_USER_ID_IDX] = user.getId();
-
-            } else {
-                mEdr[BackendConstants.EDR_SPECIAL_FLAG_IDX] = BackendConstants.BACKEND_EDR_SECURITY_BREACH;
-                throw new BackendlessException(String.valueOf(ErrorCodes.OPERATION_NOT_ALLOWED), "Operation not allowed to this user");
-            }
-
-            // Fetch pending orders for this merchant
-            List<CustomerOrder> orders = BackendOps.fetchPendingOrders(merchant.getAuto_id(),mLogger);
-            mEdr[BackendConstants.EDR_RESULT_IDX] = BackendConstants.BACKEND_EDR_RESULT_OK;
-            return orders;
-
-        } catch(Exception e) {
-            BackendUtils.handleException(e,validException,mLogger,mEdr);
-            throw e;
-        } finally {
-            BackendUtils.finalHandling(startTime,mLogger,mEdr);
-        }
-    }*/
 
     public java.util.List<Transaction> fetchPendingOrders(java.lang.String merchantId) {
         BackendUtils.initAll();
@@ -237,9 +92,13 @@ public class MerchantServices implements IBackendlessService {
     }*/
 
     // Taking txn as CSV string - as it anyways will have to be converted into one - for EDR purpose
-    public Transaction commitTxn(String csvTxnData, String pin, boolean isOtp) throws Exception {
+    /*public Transaction commitTxn(String csvTxnData, String pin, boolean isOtp) throws Exception {
         TxnProcessHelper txnEventHelper = new TxnProcessHelper();
         return txnEventHelper.handleTxnCommit(InvocationContext.getUserId(), csvTxnData, pin, isOtp, true, true);
+    }*/
+    public Transaction processTxn(Transaction txn, String pin, boolean isOtp) throws Exception {
+        TxnHelper2 txnHelper = new TxnHelper2();
+        return txnHelper.processTxn(txn, pin, isOtp);
     }
 
     public void generateTxnOtp(String custMobileOrId) {
@@ -1312,6 +1171,150 @@ public class MerchantServices implements IBackendlessService {
 
         } catch(Exception e) {
             BackendUtils.handleException(e,false,mLogger,mEdr);
+            throw e;
+        } finally {
+            BackendUtils.finalHandling(startTime,mLogger,mEdr);
+        }
+    }*/
+
+    /*public Transaction changeOrderStatus(String orderId, String argStatus, String reason) {
+        long startTime = System.currentTimeMillis();
+        mEdr[BackendConstants.EDR_START_TIME_IDX] = String.valueOf(startTime);
+        mEdr[BackendConstants.EDR_API_NAME_IDX] = "changeOrderStatus";
+        mEdr[BackendConstants.EDR_API_PARAMS_IDX] = orderId+BackendConstants.BACKEND_EDR_SUB_DELIMETER+
+                argStatus+BackendConstants.BACKEND_EDR_SUB_DELIMETER+
+                reason;
+
+        boolean validException = false;
+        try {
+            mLogger.debug("In changeOrderStatus: "+orderId+", "+argStatus);
+
+            // Only merchant allowed to create order - internal user also not allowed
+            Merchants merchant = (Merchants) BackendUtils.fetchCurrentUser(DbConstants.USER_TYPE_MERCHANT, mEdr, mLogger, false);
+            String mchntId = merchant.getAuto_id();
+            mEdr[BackendConstants.EDR_MCHNT_ID_IDX] = mchntId;
+
+            CustomerOrder order = BackendOps.getCustomerOrder(orderId, mLogger);
+
+            // check for state machine - this shud never fail, as already checked in app
+            String invalidStateChgMsg = null;
+            DbConstants.CUSTOMER_ORDER_STATUS currStatus = DbConstants.CUSTOMER_ORDER_STATUS.fromString(order.getCurrStatus());
+            DbConstants.CUSTOMER_ORDER_STATUS newStatus = DbConstants.CUSTOMER_ORDER_STATUS.fromString(argStatus);
+            if(newStatus==null) {
+                invalidStateChgMsg = "Invalid new status value";
+            } else {
+                switch (currStatus) {
+                    case New:
+                        if (newStatus != DbConstants.CUSTOMER_ORDER_STATUS.Accepted && newStatus != DbConstants.CUSTOMER_ORDER_STATUS.Cancelled) {
+                            invalidStateChgMsg = "Invalid Status change from 'New' to '"+argStatus+"'.";
+                        }
+                        break;
+                    case Accepted:
+                        if (newStatus != DbConstants.CUSTOMER_ORDER_STATUS.Dispatched && newStatus != DbConstants.CUSTOMER_ORDER_STATUS.Cancelled) {
+                            invalidStateChgMsg = "Invalid Status change from 'Accepted' to '"+argStatus+"'.";
+                        }
+                        break;
+                    case Dispatched:
+                        if (newStatus != DbConstants.CUSTOMER_ORDER_STATUS.Delivered && newStatus != DbConstants.CUSTOMER_ORDER_STATUS.Cancelled) {
+                            invalidStateChgMsg = "Invalid Status change from 'Dispatched' to '"+argStatus+"'.";
+                        }
+                        break;
+                    case Delivered:
+                    case Cancelled:
+                        invalidStateChgMsg = "Status change not allowed for '"+order.getCurrStatus()+"' orders.";
+                        break;
+                }
+            }
+            if(invalidStateChgMsg!=null) {
+                mEdr[BackendConstants.EDR_SPECIAL_FLAG_IDX] = BackendConstants.BACKEND_EDR_SECURITY_BREACH;
+                throw new BackendlessException(String.valueOf(ErrorCodes.OPERATION_NOT_ALLOWED), invalidStateChgMsg);
+            }
+
+            // Change order status
+            order.setPrevStatus(order.getCurrStatus());
+            order.setCurrStatus(newStatus.toString());
+            switch (newStatus) {
+                case Accepted:
+                    order.setAcceptTime(new Date());
+                    break;
+                case Dispatched:
+                    order.setDispatchTime(new Date());
+                    break;
+                case Delivered:
+                    order.setDeliverTime(new Date());
+                    break;
+                case Cancelled:
+                    order.setCancelTime(new Date());
+                    break;
+            }
+            order.setStatusChgReason(reason);
+            order = BackendOps.saveCustOrder(order);
+
+            // Send notification to the customer
+            try {
+                Customers cust = BackendOps.getCustomer(order.getCustPrivId(), CommonConstants.ID_TYPE_AUTO, false);
+                String msg = String.format(CommonConstants.MY_LOCALE, SmsConstants.MSG_ORDER_CANCEL_TO_CUST,
+                        orderId, order.getCurrStatus(), merchant.getName());
+
+                if(cust.getMsgDevId()==null || cust.getMsgDevId().isEmpty()) {
+                    SmsHelper.sendSMS(msg, cust.getMobile_num(), mEdr, mLogger, true);
+                } else {
+                    PushNotifier.pushNotification(msg, msg, cust.getMsgDevId(), mEdr, mLogger);
+                }
+
+            } catch (Exception e) {
+                // ignore exception
+                mLogger.error("In changeOrderStatus: Exception while sending notification.", e);
+            }
+
+            mEdr[BackendConstants.EDR_RESULT_IDX] = BackendConstants.BACKEND_EDR_RESULT_OK;
+            return order;
+
+        } catch(Exception e) {
+            BackendUtils.handleException(e,validException,mLogger,mEdr);
+            throw e;
+        } finally {
+            BackendUtils.finalHandling(startTime,mLogger,mEdr);
+        }
+    }*/
+
+    /*public java.util.List<CustomerOrder> fetchPendingOrders(java.lang.String merchantId) {
+        BackendUtils.initAll();
+        long startTime = System.currentTimeMillis();
+        mEdr[BackendConstants.EDR_START_TIME_IDX] = String.valueOf(startTime);
+        mEdr[BackendConstants.EDR_API_NAME_IDX] = "fetchPendingOrders";
+
+        boolean validException = false;
+        try {
+            mLogger.debug("In fetchPendingOrders");
+
+            // Fetch customer - send userType param as null to avoid checking within fetchCurrentUser fx.
+            // But check immediately after
+            Object userObj = BackendUtils.fetchCurrentUser(null, mEdr, mLogger, false);
+            int userType = Integer.parseInt(mEdr[BackendConstants.EDR_USER_TYPE_IDX]);
+
+            Merchants merchant = null;
+            if(userType==DbConstants.USER_TYPE_MERCHANT) {
+                merchant = (Merchants) userObj;
+                mEdr[BackendConstants.EDR_CUST_ID_IDX] = merchant.getAuto_id();
+
+            } else if(userType==DbConstants.USER_TYPE_CC) {
+                InternalUser user = (InternalUser) userObj;
+                merchant = BackendOps.getMerchant(merchantId, false, false);
+                mEdr[BackendConstants.EDR_INTERNAL_USER_ID_IDX] = user.getId();
+
+            } else {
+                mEdr[BackendConstants.EDR_SPECIAL_FLAG_IDX] = BackendConstants.BACKEND_EDR_SECURITY_BREACH;
+                throw new BackendlessException(String.valueOf(ErrorCodes.OPERATION_NOT_ALLOWED), "Operation not allowed to this user");
+            }
+
+            // Fetch pending orders for this merchant
+            List<CustomerOrder> orders = BackendOps.fetchPendingOrders(merchant.getAuto_id(),mLogger);
+            mEdr[BackendConstants.EDR_RESULT_IDX] = BackendConstants.BACKEND_EDR_RESULT_OK;
+            return orders;
+
+        } catch(Exception e) {
+            BackendUtils.handleException(e,validException,mLogger,mEdr);
             throw e;
         } finally {
             BackendUtils.finalHandling(startTime,mLogger,mEdr);
